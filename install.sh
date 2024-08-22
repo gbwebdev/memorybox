@@ -8,7 +8,9 @@ fi
 python3 -m venv venv
 source venv/bin/activate
 
-apt install -y libbluetooth-dev libopenjp2-7 libtiff5-dev libtiff6
-pip install git+https://github.com/pybluez/pybluez@master#egg=pybluez
+apt install -y libbluetooth-dev
+apt install -y libopenjp2-7 libtiff5-dev libtiff6
 
-pip install peripage
+mkdir /var/www/memorybox
+
+pip install ./memorybox

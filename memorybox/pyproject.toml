@@ -1,0 +1,43 @@
+[project]
+name = "memorybox"
+dynamic = ["version"]
+authors = [
+  { name="Guillaume BITON", email="guillaume@gbweb.fr" },
+]
+description = "An app/service to reveal one picture a day (and print it)."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Development Status :: 2 - Pre-Alpha",
+    "Framework :: Flask",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Multimedia :: Graphics :: Viewers",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
+]
+dependencies = [
+  "click",
+  "flask",
+  "pybluez @ git+https://github.com/pybluez/pybluez@master#egg=pybluez",
+  "peripage",
+]
+
+[project.urls]
+Homepage = "https://github.com/gbwebdev/memorybox"
+Issues = "https://github.com/gbwebdev/memorybox/issues"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+
+include-package-data = true
+
+[tool.setuptools.package-data]
+your_flask_app = [
+    "static/**/*",
+    "templates/**/*"
+]
