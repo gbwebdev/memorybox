@@ -1,0 +1,211 @@
+import toml
+import enum
+import datetime
+from os import path
+from peripage import PrinterType
+
+import re
+from flask import current_app, g
+
+class MemoriesSourceType(enum.Enum):
+    LOCAL = 'Local Path'
+    REPOSITORY = 'Repository'
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class Config(metaclass=Singleton):
+    """Application's end-user configuration (that can be changed through the UI)
+    """
+
+    mac_regexp = re.compile('^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$', re.IGNORECASE)
+
+    def __init__(self, app = current_app):
+        self._conf_path = path.join(app.instance_path, 'config.toml')
+        print(self._conf_path)
+
+        self._memories_source_type = MemoriesSourceType.LOCAL
+        self._memories_local_path = None
+        self._memories_repository = None
+        self._memories_repository_ignore_certificate = False
+        self._enable_daily_printing = False
+        self._workday_print_time = datetime.time(hour=8, minute=0)
+        self._holiday_print_time = datetime.time(hour=9, minute=30)
+        self._enable_holiday_mode = False
+        self._printer_mac_address = "01:23:45:67:89:AF"
+        self._printer_model = PrinterType.A6p
+
+        self.load_conf()
+
+    def save_conf(self):
+        """Save configuration to configuration file
+        """
+        config_data = {
+            'picture_source': {
+                'source_type': self._memories_source_type.name,
+                'local': {
+                    'path': self._memories_local_path
+                },
+                'repository': {
+                    'address': self._memories_repository,
+                    'ignore_certificate': self._memories_repository_ignore_certificate
+                }
+            },
+            'daily_printing': {
+                'enabled': self._enable_daily_printing,
+                'settings': {
+                    'workday_print_time': self._workday_print_time.strftime('%H:%M'),
+                    'holiday_print_time': self._holiday_print_time.strftime('%H:%M'),
+                    'holiday_mode_enabled': self._enable_holiday_mode,
+                    'printer_mac_address': self._printer_mac_address,
+                    'printer_model': self._printer_model.name
+                }
+            }
+        }
+        
+        with open(self._conf_path, 'w', encoding='utf-8') as config_file:
+            toml.dump(config_data, config_file)
+
+    def load_conf(self):
+        """Load configuration from configuration file
+        """
+        try :
+            config_data = toml.load(self._conf_path)
+
+            picture_source = config_data.get('picture_source', {})
+            self._memories_source_type = \
+                MemoriesSourceType[picture_source.get('source_type', self._memories_source_type.name)]
+            self._memories_local_path = picture_source.get('local', {}) \
+                                            .get('path', self._memories_local_path)
+            self._memories_repository = picture_source.get('repository', {}) \
+                                            .get('address', self._memories_repository)
+            self._memories_repository_ignore_certificate = picture_source.get('repository', {}) \
+                                            .get('ignore_certificate',
+                                                self._memories_repository_ignore_certificate)
+
+            daily_printing = config_data.get('daily_printing', {})
+            self._enable_daily_printing = daily_printing.get('enabled', self._enable_daily_printing)
+            daily_printing_settings = daily_printing.get('settings', {})
+            self._workday_print_time = datetime.datetime.strptime(
+                    daily_printing_settings.get('workday_print_time',
+                                                self._workday_print_time.strftime('%H:%M')),
+                    "%H:%M"
+                ).time()
+            self._holiday_print_time = datetime.datetime.strptime(
+                    daily_printing_settings.get('holiday_print_time',
+                                                self._holiday_print_time.strftime('%H:%M')),
+                    "%H:%M"
+                ).time()
+            self._enable_holiday_mode = daily_printing_settings.get('holiday_mode_enabled',
+                                                                    self._enable_holiday_mode)
+            self._printer_mac_address = daily_printing_settings.get('printer_mac_address',
+                                                                    self._printer_mac_address)
+            self._printer_model = PrinterType[daily_printing_settings.get('printer_model',
+                                                                        self._printer_model.name)]
+        except FileNotFoundError:
+            print("Config file does not exist yet.")
+
+
+    @property
+    def memories_local_path(self) -> path:
+        """Path of the local directory for the memories packages.
+        """
+        return self._memories_local_path
+
+    @memories_local_path.setter
+    def memories_local_path(self, memories_local_path: path):
+        self._memories_local_path = memories_local_path
+        self.save_conf()
+
+    @property
+    def memories_repository(self) -> str:
+        """Address of the repository server for the memories packages.
+        """
+        return self._memories_repository
+
+    @memories_repository.setter
+    def memories_repository(self, memories_repository: str):
+        self._memories_repository = memories_repository
+        self.save_conf()
+
+    @property
+    def memories_repository_ignore_certificate(self) -> bool:
+        """Ignore certificate when connecting to the repository server for the memories packages.
+        """
+        return self._memories_repository_ignore_certificate
+
+    @memories_repository_ignore_certificate.setter
+    def memories_repository_ignore_certificate(self, memories_repository_ignore_certificate: bool):
+        self._memories_repository_ignore_certificate = memories_repository_ignore_certificate
+        self.save_conf()
+
+    @property
+    def enable_daily_printing(self) -> bool:
+        """Enable automatic printing of the day's memory.
+        """
+        return self._enable_daily_printing
+
+    @enable_daily_printing.setter
+    def enable_daily_printing(self, enable_daily_printing: bool):
+        self._enable_daily_printing = enable_daily_printing
+        self.save_conf()
+
+    @property
+    def workday_print_time(self) -> datetime.time:
+        """Time at which the daily memory should be printed on a workday.
+        """
+        return self._workday_print_time
+
+    @workday_print_time.setter
+    def workday_print_time(self, workday_print_time: datetime.time):
+        self._workday_print_time = workday_print_time
+        self.save_conf()
+
+    @property
+    def holiday_print_time(self) -> datetime.time:
+        """Time at which the daily memory should be printed on a weekend / holiday.
+        """
+        return self._holiday_print_time
+
+    @holiday_print_time.setter
+    def holiday_print_time(self, holiday_print_time: datetime.time):
+        self._holiday_print_time = holiday_print_time
+        self.save_conf()
+
+    @property
+    def enable_holiday_mode(self) -> bool:
+        """Enable holiday mode (when enabled, everyday is considered a holiday).
+        """
+        return self._enable_holiday_mode
+
+    @enable_holiday_mode.setter
+    def enable_holiday_mode(self, enable_holiday_mode: bool):
+        self._enable_holiday_mode = enable_holiday_mode
+        self.save_conf()
+
+    @property
+    def printer_mac_address(self) -> str:
+        """MAC address of the printer.
+        """
+        return self._printer_mac_address
+
+    @printer_mac_address.setter
+    def printer_mac_address(self, printer_mac_address: str):
+        assert Config.mac_regexp.match(printer_mac_address)
+        self._printer_mac_address = printer_mac_address
+        self.save_conf()
+
+    @property
+    def printer_model(self) -> PrinterType:
+        """Model of the printer.
+        """
+        return self._printer_model
+
+    @printer_model.setter
+    def printer_model(self, printer_model: PrinterType):
+        self._printer_model = printer_model
+        self.save_conf()

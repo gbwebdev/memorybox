@@ -11,6 +11,7 @@ from flask import Flask
 
 from memorybox import db
 from memorybox import blueprints
+from memorybox.config import Config
 
 logger = logging.getLogger("baselogger")
 
@@ -31,6 +32,12 @@ def create_app(mode='dev', test_config=None):
         DATABASE=os.path.join(app.instance_path, 'memorybox.sqlite'),
     )
 
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -38,12 +45,7 @@ def create_app(mode='dev', test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-    
+    config = Config(app)
 
     db.init_app(app)
 

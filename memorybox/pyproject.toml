@@ -22,6 +22,7 @@ dependencies = [
   "flask",
   "pybluez @ git+https://github.com/pybluez/pybluez@master#egg=pybluez",
   "peripage",
+  "toml"
 ]
 
 [project.urls]
