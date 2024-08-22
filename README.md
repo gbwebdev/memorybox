@@ -1,6 +1,6 @@
 # memorybox
 
-![Memorybox logo](./memorybox.svg?raw=true "Memorybox logo" | width=256)
+![Memorybox logo](./memorybox.svg?raw=true "Memorybox logo")
 
 Memorybox is a lightweight webapp that reveals a new memory picture everyday.
 
