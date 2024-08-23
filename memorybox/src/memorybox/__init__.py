@@ -45,7 +45,7 @@ def create_app(mode='dev', test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    config = Config(app)
+    Config(app)
 
     db.init_app(app)
 

@@ -23,10 +23,10 @@ class Config(metaclass=Singleton):
     """
 
     mac_regexp = re.compile('^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$', re.IGNORECASE)
-
+    time_regexp = re.compile('^[0:2][0-9]:[0:5][0-9]$')
     def __init__(self, app = current_app):
         self._conf_path = path.join(app.instance_path, 'config.toml')
-        print(self._conf_path)
+        self._autosave = False
 
         self._memories_source_type = MemoriesSourceType.LOCAL
         self._memories_local_path = None
@@ -109,6 +109,30 @@ class Config(metaclass=Singleton):
         except FileNotFoundError:
             print("Config file does not exist yet.")
 
+    def _handle_autosave(self):
+        if self._autosave:
+            self.save_conf()
+
+    @property
+    def autosave(self) -> bool:
+        """If True, the configuration will be automatically saved everytime a setting changes.
+        """
+        return self._autosave
+
+    @autosave.setter
+    def autosave(self, autosave: bool):
+        self._autosave = autosave
+
+    @property
+    def memories_source_type(self) -> MemoriesSourceType:
+        """Type of source for the memories packages.
+        """
+        return self._memories_source_type
+
+    @memories_source_type.setter
+    def memories_source_type(self, memories_source_type: MemoriesSourceType):
+        self._memories_source_type = memories_source_type
+        self._handle_autosave()
 
     @property
     def memories_local_path(self) -> path:
@@ -119,7 +143,7 @@ class Config(metaclass=Singleton):
     @memories_local_path.setter
     def memories_local_path(self, memories_local_path: path):
         self._memories_local_path = memories_local_path
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def memories_repository(self) -> str:
@@ -130,7 +154,7 @@ class Config(metaclass=Singleton):
     @memories_repository.setter
     def memories_repository(self, memories_repository: str):
         self._memories_repository = memories_repository
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def memories_repository_ignore_certificate(self) -> bool:
@@ -141,7 +165,7 @@ class Config(metaclass=Singleton):
     @memories_repository_ignore_certificate.setter
     def memories_repository_ignore_certificate(self, memories_repository_ignore_certificate: bool):
         self._memories_repository_ignore_certificate = memories_repository_ignore_certificate
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def enable_daily_printing(self) -> bool:
@@ -152,7 +176,7 @@ class Config(metaclass=Singleton):
     @enable_daily_printing.setter
     def enable_daily_printing(self, enable_daily_printing: bool):
         self._enable_daily_printing = enable_daily_printing
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def workday_print_time(self) -> datetime.time:
@@ -163,7 +187,7 @@ class Config(metaclass=Singleton):
     @workday_print_time.setter
     def workday_print_time(self, workday_print_time: datetime.time):
         self._workday_print_time = workday_print_time
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def holiday_print_time(self) -> datetime.time:
@@ -174,7 +198,7 @@ class Config(metaclass=Singleton):
     @holiday_print_time.setter
     def holiday_print_time(self, holiday_print_time: datetime.time):
         self._holiday_print_time = holiday_print_time
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def enable_holiday_mode(self) -> bool:
@@ -185,7 +209,7 @@ class Config(metaclass=Singleton):
     @enable_holiday_mode.setter
     def enable_holiday_mode(self, enable_holiday_mode: bool):
         self._enable_holiday_mode = enable_holiday_mode
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def printer_mac_address(self) -> str:
@@ -197,7 +221,7 @@ class Config(metaclass=Singleton):
     def printer_mac_address(self, printer_mac_address: str):
         assert Config.mac_regexp.match(printer_mac_address)
         self._printer_mac_address = printer_mac_address
-        self.save_conf()
+        self._handle_autosave()
 
     @property
     def printer_model(self) -> PrinterType:
@@ -208,4 +232,4 @@ class Config(metaclass=Singleton):
     @printer_model.setter
     def printer_model(self, printer_model: PrinterType):
         self._printer_model = printer_model
-        self.save_conf()
+        self._handle_autosave()

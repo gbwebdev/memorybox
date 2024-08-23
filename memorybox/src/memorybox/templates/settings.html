@@ -6,27 +6,102 @@
 
 {% block content %}
 <div class="container mt-5">
-  <div class="row justify-content-center">
-      <div class="col-md-6">
-          <h2 class="text-center mb-4">Settings</h2>
-          <form>
-              <div class="mb-3">
-                  <label for="workdayPrintTime" class="form-label">Print Time (workdays)</label>
-                  <input type="time" class="form-control" id="workdayPrintTime" name="workdayPrintTime" step="900" required>
-              </div>
-              <div class="mb-3">
-                  <label for="holidayPrintTime" class="form-label">Print Time (weekends and holidays)</label>
-                  <input type="time" class="form-control" id="holidayPrintTime" name="holidayPrintTime" step="900" required>
-              </div>
-              <div class="mb-3 form-check">
-                <input class="form-check-input" type="checkbox" value="" id="enableHolidayMode" name="enableHolidayMode">
-                <label for="enableHolidayMode" class="form-label">
-                  Enable Holidays Mode
-                </label>
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Save Settings</button>
-          </form>
-      </div>
-  </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4"><i class="bi bi-sliders2"></i> Settings</h2>
+            <form method="post">
+                <div class="card my-1">
+                    <div class="card-header">
+                        <i class="bi bi-box-arrow-in-right"></i> Memories source
+                    </div>
+                    <div class="card-body">
+                        <label for="memoriesSourceType" class="form-label">Memories source</label>
+                        <select class="form-select" name="memoriesSourceType" id="memoriesSourceType">
+                        {% for source_type in source_types %}
+                            <option value="{{ source_type.name }}" {% if settings.memories_source_type.name == source_type.name %}selected{% endif %}>{{ source_type.value }}</option>
+                        {% endfor %}
+                        </select>
+                        <div class="card my-2" id="localSourceSettings" {% if settings.memories_source_type.name != "LOCAL" %}style="display: none;"{% endif %}>
+                            <div class="card-header">
+                                <i class="bi bi-folder2"></i> Local source settings
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <label for="memoriesLocalPath" class="form-label">Local memories packages directory</label>
+                                    <input type="text" class="form-control" id="memoriesLocalPath" name="memoriesLocalPath" value="{{ settings.memories_local_path }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-2" id="repositorySourceSettings" {% if settings.memories_source_type.name != "REPOSITORY" %}style="display: none;"{% endif %}>
+                            <div class="card-header">
+                                <i class="bi bi-cloud-download"></i> Repository source settings
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="memoriesRepoAddress" class="form-label">Repository address</label>
+                                    <input type="text" class="form-control" id="memoriesRepoAddress" name="memoriesRepoAddress" value="{{ settings.memories_repository }}" required>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" value="true" id="memoriesRepoIgnoreCertificate" name="memoriesRepoIgnoreCertificate" {% if settings.memories_repository_ignore_certificate %}checked{% endif %}>
+                                    <label for="memoriesRepoIgnoreCertificate" class="form-label">
+                                        Ignore certificate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card my-1">
+                    <div class="card-header">
+                        <i class="bi bi-printer"></i> Printing
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input class="form-check-input" type="checkbox" value="true" id="enablePrinting" name="enablePrinting" {% if settings.enable_daily_printing %}checked{% endif %}>
+                            <label for="enablePrinting" class="form-label">
+                                Enable daily printing
+                            </label>
+                        </div>
+                        <div class="card my-1" {% if not settings.enable_daily_printing %}style="display: none;"{% endif %}>
+                            <div class="card-header">
+                                <i class="bi bi-sliders2"></i> Printing settings
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="printerType" class="form-label">Printer type</label>
+                                    <select class="form-select" name="printerType" id="printerType">
+                                    {% for printer_type in printer_types %}
+                                        <option value="{{ printer_type.name }}" {% if settings.printer_model.name == printer_type.name %}selected{% endif %}>{{ printer_type.name }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="printerMacAddress" class="form-label">MAC address</label>
+                                    <input type="text" class="form-control" id="printerMacAddress" name="printerMacAddress" value="{{ settings.printer_mac_address }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="workdayPrintTime" class="form-label">Print Time (workdays)</label>
+                                    <input type="time" class="form-control" id="workdayPrintTime" name="workdayPrintTime" step="900" value="{{ settings.workday_print_time }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="holidayPrintTime" class="form-label">Print Time (weekends and holidays)</label>
+                                    <input type="time" class="form-control" id="holidayPrintTime" name="holidayPrintTime" value="{{ settings.holiday_print_time }}" step="900" required>
+                                </div>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" value="true" id="enableHolidayMode" name="enableHolidayMode" {% if settings.enable_holiday_mode %}checked{% endif %}>
+                                  <label for="enableHolidayMode" class="form-label">
+                                    Enable Holidays Mode
+                                  </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mb-5">Save Settings</button>
+            </form>
+        </div>
+    </div>  
 </div>
 {% endblock %}
