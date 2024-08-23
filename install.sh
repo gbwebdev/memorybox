@@ -5,7 +5,9 @@ if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   exit 1
 fi
 
-python3 -m venv venv
+if [ ! -d ./venv ]; then
+  python3 -m venv venv
+fi
 source venv/bin/activate
 
 apt install -y libbluetooth-dev
