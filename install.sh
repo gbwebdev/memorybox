@@ -6,8 +6,8 @@ if [ "${EUID:-$(id -u)}" -ne 0 ]; then
 fi
 
 function run_as_user {
-  if [ ! -z $SUDO_UID ]; then
-    su - $SUDO_UID -c "$1"
+  if [ ! -z $SUDO_USER ]; then
+    su - $SUDO_USER -c "$1"
   else
     eval "$1"
   fi
