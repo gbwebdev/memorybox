@@ -5,10 +5,12 @@ if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   exit 1
 fi
 
-if [ ! -d ./venv ]; then
-  python3 -m venv venv
+if [ ! -z $SUDO_UID ]; then
+  if [ ! -d ./venv ]; then
+    su - $SUDO_UID -c "python3 -m venv venv"
+  fi
+  source venv/bin/activate
 fi
-source venv/bin/activate
 
 apt install -y libbluetooth-dev
 apt install -y libopenjp2-7 libtiff5-dev libtiff6
@@ -16,6 +18,5 @@ apt install -y libopenjp2-7 libtiff5-dev libtiff6
 mkdir -p /var/www/memorybox
 if [ ! -z $SUDO_UID ]; then
   chown $SUDO_UID /var/www/memorybox
+  su - $SUDO_UID -c "source venv/bin/activate && pip install ./memorybox"
 fi
-
-pip install ./memorybox
