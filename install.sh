@@ -25,5 +25,5 @@ apt install -y libopenjp2-7 libtiff5-dev libtiff6
 mkdir -p /var/www/memorybox
 if [ ! -z $SUDO_UID ]; then
   chown $SUDO_UID /var/www/memorybox
-  su - $SUDO_UID -c "source venv/bin/activate && pip install ./memorybox"
+  run_as_user "source venv/bin/activate && pip install ./memorybox"
 fi
