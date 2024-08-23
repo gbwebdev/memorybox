@@ -22,6 +22,8 @@ dependencies = [
   "flask",
   "pybluez @ git+https://github.com/pybluez/pybluez@master#egg=pybluez",
   "peripage",
+  "BeautifulSoup4",
+  "requests",
   "toml"
 ]
 
@@ -32,6 +34,9 @@ Issues = "https://github.com/gbwebdev/memorybox/issues"
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+
+[project.scripts]
+memorybox_server = "memorybox:run_server"
 
 [tool.setuptools]
 include-package-data = true

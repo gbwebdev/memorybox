@@ -57,3 +57,7 @@ def create_app(mode='dev', test_config=None):
         return 'Hello, World!'
 
     return app
+
+def run_server(mode="production"):
+    app = create_app(mode)
+    app.run(host="0.0.0.0", port=80)
