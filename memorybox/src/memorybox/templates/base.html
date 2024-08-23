@@ -11,11 +11,11 @@
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='icons/bootstrap/font/bootstrap-icons.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark px-2">
       <a class="navbar-brand" href="{{ url_for('main.index') }}" style="font-weight: bold; font-size: x-large;">
             <img src="{{ url_for('static', filename='img/memorybox.svg') }}" width="48" height="48" class="d-inline-block align-center" alt="">
             Memorybox
@@ -36,7 +36,6 @@
 
     <!--<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>-->
     <script src="{{ url_for('static', filename='js/jquery-3.4.1.slim.min.js') }}" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
-    <script src="{{ url_for('static', filename='js/popper.min.js') }}" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"></script>
   </body>
 </html>
