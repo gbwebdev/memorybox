@@ -13,6 +13,9 @@ source venv/bin/activate
 apt install -y libbluetooth-dev
 apt install -y libopenjp2-7 libtiff5-dev libtiff6
 
-mkdir /var/www/memorybox
+mkdir -p /var/www/memorybox
+if [ ! -z $SUDO_UID ]; then
+  chown $SUDO_UID /var/www/memorybox
+fi
 
 pip install ./memorybox
