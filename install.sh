@@ -5,12 +5,19 @@ if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   exit 1
 fi
 
-if [ ! -z $SUDO_UID ]; then
-  if [ ! -d ./venv ]; then
-    su - $SUDO_UID -c "python3 -m venv venv"
+function run_as_user {
+  if [ ! -z $SUDO_UID ]; then
+    su - $SUDO_UID -c "$1"
+  else
+    eval "$1"
   fi
-  source venv/bin/activate
+}
+
+if [ ! -d ./venv ]; then
+  run_as_user "python3 -m venv venv"
 fi
+
+run_as_user "source venv/bin/activate"
 
 apt install -y libbluetooth-dev
 apt install -y libopenjp2-7 libtiff5-dev libtiff6
