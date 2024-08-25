@@ -1,17 +1,33 @@
 import logging
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
 )
-from datetime import datetime
+from datetime import date
 from peripage import PrinterType
 
 # from memorybox.db import get_db
 from memorybox.config import Config, MemoriesSourceType
-
+from memorybox.db import db
+from memorybox.model.memory import Memory
 
 logger = logging.getLogger("memorybox")
 
 bp = Blueprint('main', __name__)
+
+
+def get_todays_memory():
+    res = Memory.query.filter_by(release_date=date.today()).first()
+    if not res :
+        first_candidate = Memory.query.filter_by(release_date=None).first()
+        if first_candidate:
+            first_candidate.release_date = date.today()
+            db.session.commit()
+            return first_candidate
+        else:
+            return Memory.query.order_by("release_date").first()
+    else:
+        return res
+
 
 # @bp.route('/manifest.json')
 # def serve_manifest():
@@ -19,11 +35,24 @@ bp = Blueprint('main', __name__)
 #     """
 #     return send_static_file('manifest.json', mimetype='application/manifest+json')
 
+@bp.route('/memory-fullres/<filename>')
+def memory_fullres(filename):
+    # Send a file from the instance directory's images folder
+    return send_from_directory(current_app.instance_path, f'memories/{filename}')
+
+
+@bp.route('/memory-thumb/<filename>')
+def memory_thumb(filename):
+    # Send a file from the instance directory's images folder
+    return send_from_directory(current_app.instance_path, f'memories/thumbs/{filename}')
+
 @bp.route('/', methods=['GET'])
 def index():
     """Main (home) page
     """
-    return render_template('index.html')
+    todays_memory=get_todays_memory() 
+    thumbnail_path = f"memories/thumbs/{todays_memory.filename}"
+    return render_template('index.html', todays_memory=get_todays_memory(),thumbnail_path=thumbnail_path)
 
 @bp.route('/settings', methods=('GET', 'POST'))
 def settings():
