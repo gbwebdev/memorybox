@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
   "click",
   "flask",
+  "Flask-SQLAlchemy",
   "pybluez @ git+https://github.com/pybluez/pybluez@master#egg=pybluez",
   "peripage",
   "BeautifulSoup4",
@@ -36,7 +37,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
-memorybox_server = "memorybox:run_server"
+memorybox = "memorybox:cli"
 
 [tool.setuptools]
 include-package-data = true

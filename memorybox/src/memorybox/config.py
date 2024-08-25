@@ -24,8 +24,8 @@ class Config(metaclass=Singleton):
 
     mac_regexp = re.compile('^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$', re.IGNORECASE)
     time_regexp = re.compile('^[0:2][0-9]:[0:5][0-9]$')
-    def __init__(self, app = current_app):
-        self._conf_path = path.join(app.instance_path, 'config.toml')
+    def __init__(self):
+        self._conf_path = path.join(current_app.instance_path, 'config.toml')
         self._autosave = False
 
         self._memories_source_type = MemoriesSourceType.LOCAL

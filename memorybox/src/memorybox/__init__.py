@@ -6,58 +6,93 @@
 import logging
 import os
 import sys
+import click
 
 from flask import Flask
+from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 
-from memorybox import db
+from memorybox.db import db
 from memorybox import blueprints
 from memorybox.config import Config
+from memorybox.fetch_memories import fetch_memories as fetch_memories_func
 
-logger = logging.getLogger("baselogger")
+logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
 
-def create_app(mode='dev', test_config=None):
-    if mode.startswith('dev'):
+logger = logging.getLogger("memorybox")
+# logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO').upper())
+
+def create_app(*args, **kwargs):
+    """Flask application factory"""
+    ctx = click.get_current_context(silent=True)
+    if ctx:
+        script_info = ctx.obj
+        mode = script_info.mode.upper()
+    elif kwargs.get("mode"):
+        mode = kwargs["mode"].upper()
+
+    if mode.startswith('DEV'):
+        logger.info("Running in dev mode")
         instance_path = None
-    elif mode.startswith('prod'):
+    elif mode.startswith('PROD'):
+        logger.info("Running in production mode")
         instance_path="/var/www/memorybox"
     else:
         logger.error('Unknown mode "%s"', mode)
         sys.exit(1)
+
     # create and configure the app
     app = Flask(__name__,
                 instance_relative_config=True,
                 instance_path=instance_path)
+    
+    app.logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO').upper())
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'memorybox.sqlite'),
+        SQLALCHEMY_DATABASE_URI="sqlite://"+os.path.join(app.instance_path, 'memorybox.sqlite'),
     )
+    app.config.from_pyfile('config.py', silent=True)
 
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
-
-    Config(app)
+    
+    with app.app_context():
+        Config()
 
     db.init_app(app)
 
     app.register_blueprint(blueprints.main.bp)
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-
     return app
 
-def run_server(mode="production"):
+def run_server_command(mode="production"):
     app = create_app(mode)
     app.run(host="0.0.0.0", port=8080)
+
+
+@click.group(cls=FlaskGroup, create_app=create_app)
+@click.option('-m',
+              '--mode',
+              type=click.Choice(['dev', 'prod'], case_sensitive=False,),
+              default="prod")
+@pass_script_info
+def cli(script_info, mode):
+    """Management script for the Wiki application."""
+    script_info.mode = mode
+
+@cli.command()
+@with_appcontext
+def fetch_memories_packages():
+    """Retreive memories from external source"""
+    logger.info("Fetching memories")
+    fetch_memories_func()
+
+@cli.command()
+@with_appcontext
+def init_db():
+    """Initialize the databse"""
+    logger.info("Initializing database")
+    from memorybox.model import memory
+    
