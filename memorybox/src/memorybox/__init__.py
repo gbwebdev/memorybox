@@ -8,18 +8,16 @@ import os
 import sys
 import click
 
-from flask import Flask
+from flask import Flask, current_app
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 
-from memorybox.db import db
+
 from memorybox import blueprints
 from memorybox.config import Config
-from memorybox.fetch_memories import fetch_memories as fetch_memories_func
+
 
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
-
 logger = logging.getLogger("memorybox")
-# logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO').upper())
 
 def create_app(*args, **kwargs):
     """Flask application factory"""
@@ -48,28 +46,29 @@ def create_app(*args, **kwargs):
     app.logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO').upper())
     app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI="sqlite://"+os.path.join(app.instance_path, 'memorybox.sqlite'),
+        SQLALCHEMY_DATABASE_URI='sqlite:///memorybox.db'
     )
     app.config.from_pyfile('config.py', silent=True)
 
     # ensure the instance folder exists
+    app.config['memories_path'] = os.path.join(app.instance_path, 'memories')
+    app.config['thumbnails_path'] = os.path.join(app.config['memories_path'], 'thumbs')
     try:
-        os.makedirs(app.instance_path)
+        os.makedirs(app.instance_path, exist_ok=True)
+        os.makedirs(app.config['memories_path'], exist_ok=True)
+        os.makedirs(app.config['thumbnails_path'], exist_ok=True)
     except OSError:
         pass
     
     with app.app_context():
         Config()
-
-    db.init_app(app)
+        from memorybox.db import db
+        db.init_app(app)
+        logger.debug("Init app done")
 
     app.register_blueprint(blueprints.main.bp)
 
     return app
-
-def run_server_command(mode="production"):
-    app = create_app(mode)
-    app.run(host="0.0.0.0", port=8080)
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
@@ -84,9 +83,10 @@ def cli(script_info, mode):
 
 @cli.command()
 @with_appcontext
-def fetch_memories_packages():
+def fetch_memories():
     """Retreive memories from external source"""
     logger.info("Fetching memories")
+    from memorybox.fetch_memories import fetch_memories as fetch_memories_func
     fetch_memories_func()
 
 @cli.command()
@@ -94,5 +94,7 @@ def fetch_memories_packages():
 def init_db():
     """Initialize the databse"""
     logger.info("Initializing database")
-    from memorybox.model import memory
+    from memorybox.tools import init_db
+    with current_app.app_context():
+        init_db.init_db()
     
