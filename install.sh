@@ -13,6 +13,13 @@ function run_as_user {
   fi
 }
 
+echo "o Installing dependencies..."
+apt update
+apt install -y python3-venv
+apt install -y libbluetooth-dev
+apt install -y libopenjp2-7 libtiff5-dev libtiff6
+echo "  ...done."
+
 if [ ! -d ./venv ]; then
   echo "o Creating python virtual environment..."
   run_as_user "python3 -m venv venv"
@@ -21,12 +28,6 @@ fi
 
 echo "o Activating python virtual environment."
 run_as_user "source venv/bin/activate"
-
-echo "o Installing dependencies..."
-apt update
-apt install -y libbluetooth-dev
-apt install -y libopenjp2-7 libtiff5-dev libtiff6
-echo "  ...done."
 
 echo "o Creating instance directory..."
 mkdir -p /var/www/memorybox
