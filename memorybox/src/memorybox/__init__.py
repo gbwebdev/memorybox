@@ -75,7 +75,8 @@ def create_app(*args, **kwargs):
 @click.option('-m',
               '--mode',
               type=click.Choice(['dev', 'prod'], case_sensitive=False,),
-              default="prod")
+              default="prod",
+              help="Mode")
 @pass_script_info
 def cli(script_info, mode):
     """Management script for the Wiki application."""
@@ -86,15 +87,21 @@ def cli(script_info, mode):
 def fetch_memories():
     """Retreive memories from external source"""
     logger.info("Fetching memories")
-    from memorybox.fetch_memories import fetch_memories as fetch_memories_func
+    from memorybox.tools.fetch_memories import fetch_memories as fetch_memories_func
     fetch_memories_func()
 
 @cli.command()
+@click.option("-r",
+              "--reset",
+              is_flag=True,
+              show_default=True,
+              default=False,
+              help="Reset the database.")
 @with_appcontext
-def init_db():
+def init_db(reset):
     """Initialize the databse"""
     logger.info("Initializing database")
     from memorybox.tools import init_db
     with current_app.app_context():
-        init_db.init_db()
+        init_db.init_db(reset)
     
