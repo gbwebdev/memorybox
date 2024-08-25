@@ -5,13 +5,19 @@ from flask import (
 from datetime import datetime
 from peripage import PrinterType
 
-from memorybox.db import get_db
+# from memorybox.db import get_db
 from memorybox.config import Config, MemoriesSourceType
 
 
-logger = logging.getLogger("baselogger")
+logger = logging.getLogger("memorybox")
 
 bp = Blueprint('main', __name__)
+
+# @bp.route('/manifest.json')
+# def serve_manifest():
+#     """Serve PWA manifest
+#     """
+#     return send_static_file('manifest.json', mimetype='application/manifest+json')
 
 @bp.route('/', methods=['GET'])
 def index():
