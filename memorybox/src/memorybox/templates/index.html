@@ -12,7 +12,9 @@
     </div>
     <img src="memory-thumb/{{ todays_memory.filename }}" class="card-img-top" alt="...">
     <div class="card-body">
-      {% if todays_memory.author != "Unknown" %}<h3>{{ todays_memory.author }}</h3>{% endif %}
+      {% if todays_memory.author != "Unknown" %}
+      <h3>{{ todays_memory.author }}</h3>
+      {% endif %}
       <p class="card-text">{{ todays_memory.captation }}</p>
 
 
@@ -21,7 +23,9 @@
       <br/>
       <br/>
       <div class="d-flex justify-content-between">
-        <a href="#" class="btn btn-outline-primary"><i class="bi bi-caret-left-fill"></i> Prev.</a>
+        {% if yesterdays_memory_id >= 0 %}
+        <a href="/memory/{{ yesterdays_memory_id }}" class="btn btn-outline-primary"><i class="bi bi-caret-left-fill"></i> Prev.</a>
+        {% endif %}
         <a href="#" class="btn btn-outline-primary">Next <i class="bi bi-caret-right-fill"></i></a>
       </div>
     </div>

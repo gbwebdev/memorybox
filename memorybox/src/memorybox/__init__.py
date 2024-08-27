@@ -14,6 +14,7 @@ from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 
 from memorybox import blueprints
 from memorybox.config import Config
+from memorybox.login import login_manager
 
 
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
@@ -46,7 +47,9 @@ def create_app(*args, **kwargs):
     app.logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO').upper())
     app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI='sqlite:///memorybox.db'
+        SQLALCHEMY_DATABASE_URI='sqlite:///memorybox.db',
+        ALLOWED_HOSTS=['127.0.0.1', 'localhost'],
+        REQUIRE_HTTPS=False
     )
     app.config.from_pyfile('config.py', silent=True)
 
@@ -64,9 +67,12 @@ def create_app(*args, **kwargs):
         Config()
         from memorybox.db import db
         db.init_app(app)
+        login_manager.init_app(app)
+        login_manager.login_view = "auth.login"
         logger.debug("Init app done")
 
     app.register_blueprint(blueprints.main.bp)
+    app.register_blueprint(blueprints.auth.bp)
 
     return app
 

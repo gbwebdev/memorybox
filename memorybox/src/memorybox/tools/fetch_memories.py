@@ -32,7 +32,7 @@ def _fetch_memories_from_local_directory():
             #current_app.logger.info(exifdata)
             #Define the thumbnail size as a tuple (width, height)
 
-            base_width = 1280
+            base_width = 1920
             wpercent = (base_width / float(image.size[0]))
             hsize = int((float(image.size[1]) * float(wpercent)))
             image = image.resize((base_width, hsize), Image.BILINEAR)

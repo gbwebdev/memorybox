@@ -21,6 +21,7 @@ dependencies = [
   "click",
   "flask",
   "Flask-SQLAlchemy",
+  "flask-login",
   "pybluez @ git+https://github.com/pybluez/pybluez@master#egg=pybluez",
   "peripage",
   "BeautifulSoup4",

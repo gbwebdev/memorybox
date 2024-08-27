@@ -1,1 +1,1 @@
-from memorybox.blueprints import main
+from memorybox.blueprints import main, auth
