@@ -31,7 +31,8 @@ def get_memory_by_date(date_value: date):
                 db.session.commit()
                 return first_candidate
             else:
-                return Memory.query.order_by("release_date").first()
+                #return Memory.query.order_by("release_date").first()
+                return None
         else:
             return None
     else:
@@ -62,19 +63,28 @@ def index():
     """Main (home) page
     """
     todays_memory = get_memory_by_date(date.today())
-    return memory(todays_memory.id)
+    if todays_memory:
+        return memory(todays_memory.id, True)
+    else:
+        latest_memory = Memory.query.order_by(desc("release_date")).first()
+        return redirect(url_for('main.memory', id=latest_memory.id))
 
 @bp.route('/memory/<int:id>', methods=['GET'])
 @login_required
-def memory(id):
+def memory(id, today = False):
     """Memory page
     """
     memory = get_memory_by_id(id)
+    if today:
+        title = "Today's memory"
+    else:
+        title = memory.release_date.strftime("%d. %B %Y's memory")
     previous_day_memory = get_memory_by_date(memory.release_date - timedelta(days=1))
     next_day_memory = get_memory_by_date(memory.release_date + timedelta(days=1))
     thumbnail_path = f"memories/thumbs/{memory.filename}"
     return render_template('memory.html',
                            memory=memory,
+                           title=title,
                            previous_day_memory=previous_day_memory,
                            next_day_memory=next_day_memory,
                            thumbnail_path=thumbnail_path)
