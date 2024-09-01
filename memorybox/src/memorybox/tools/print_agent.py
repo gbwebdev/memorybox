@@ -18,7 +18,7 @@ def on_notify_agent(data):
 
 
 
-@sio.on('button_click')
+@sio.on('print')
 def on_button_clicked(data):
     print('Received notification from server:', data['message'])
     # Perform actions in response to the notification

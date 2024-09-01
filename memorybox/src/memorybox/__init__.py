@@ -126,12 +126,12 @@ def run_dev():
     socketio.run(app)
 
 @cli.command()
-@cli.option('-s',
+@click.option('-s',
             '--server',
             required=True,
             type=str,
             envvar='MEMORYBOX_SERVER',
-            helper="Memorybox server address.")
+            help="Memorybox server address.")
 def run_print_agent(server):
     """Run the print agent"""
     logger.info("Running the print agent.")
