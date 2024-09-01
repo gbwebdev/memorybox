@@ -4,6 +4,8 @@ import peripage
 from PIL import Image
 import io
 
+from bluetooth.btcommon import BluetoothError
+
 # Create a Socket.IO client
 sio = socketio.Client()
 
@@ -37,7 +39,7 @@ def on_button_clicked(data):
         printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
         printer.connect()
         printer.reset()
-    except bluetooth.btcommon.BluetoothError as e:
+    except BluetoothError as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
             'status': 500,
