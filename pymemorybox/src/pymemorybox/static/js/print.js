@@ -13,55 +13,61 @@ socket.on('notify_agent', function(data) {
 });
 
 // Listen for notifications from the agent
-socket.on('agent', function(data) {
-  console.log('Received data from the agent');
-  console.log(data);
-  // Here you can perform additional actions when the agent is notified
+socket.on('agent_response', function(data) {
+    console.log('Received data from the agent');
+    console.log(data);
+    // Here you can perform additional actions when the agent is notified
 });
 
 function triggerPrint(memoryId) {
-  //socket.emit('print', memoryId);
+    //socket.emit('print', memoryId);
+    $('#printButton').prop("disabled",true);
+    socket.emit("print", memoryId, withTimeout((response) => {
+        setPrintMessage(response, "info", "Print request sent.");
+    }, () => {
+        setPrintMessage("UNKNOWN", "error", "Server did not respond.");
+    }, 5000));
 
-  socket.emit("print", memoryId, withTimeout((response) => {
-    console.log("success!");
-    console.log(response);
-  }, () => {
-    console.log("timeout!");
-  }, 1000));
-
-  console.log("Requested print for memory id ", memoryId);
-  setPrintMessage("info", "Print request sent.");
+    console.log("Requested print for memory id ", memoryId);
 }
 
-function setPrintMessage(kind, message, duration=0) {
-  $('#printAlert').show();
-  $('#printAlert').removeClass();
-  $('#printAlert').addClass('alert');
-  $('#printAlert').addClass('alert-' + kind);
-  $('#printAlert').text(message);
-  if(duration > 0){
-    $('#printAlert').delay(duration).queue(function(next){
-      $(this).hide();
-      next();
-   });
-  }
+function setPrintMessage(uid, kind, message, duration=0) {
+
+    var alertelem = $('[data-printid="uid"]');
+    console.log(alertelem);
+    if (alertelem.length == 0) {
+        console.log("Creating div");
+        $("#printStatuses").append('<div data-printid="' + uid + '"></div>');
+        alertelem = $('[data-printid="'+uid+'"]');
+    }
+    console.log(alertelem)
+    alertelem.removeClass();
+    alertelem.addClass('alert');
+    alertelem.addClass('alert-' + kind);
+    alertelem.text(message);
+    if(duration > 0){
+        alertelem.delay(duration).queue(function(next){
+        $(this).hide();
+        next();
+    });
+    }
 }
 
 
 
 const withTimeout = (onSuccess, onTimeout, timeout) => {
-  let called = false;
+    let called = false;
 
-  const timer = setTimeout(() => {
-    if (called) return;
-    called = true;
-    onTimeout();
-  }, timeout);
+    const timer = setTimeout(() => {
+        if (called) return;
+        called = true;
+        onTimeout();
+    }, timeout);
 
-  return (...args) => {
-    if (called) return;
-    called = true;
-    clearTimeout(timer);
-    onSuccess.apply(this, args);
-  }
+    return (...args) => {
+        if (called) return;
+        called = true;
+        clearTimeout(timer);
+        onSuccess.apply(this, args);
+    }
 }

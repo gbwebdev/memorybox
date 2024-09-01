@@ -51,7 +51,7 @@ def get_memory_by_date(date_value: date):
 # Handle button click event from the client-side
 @socketio.on('print')
 def handle_print(id):
-    uid = str(uuid.uuid4())
+    uid = str(uuid.uuid4()).strip()
     the_memory = get_memory_by_id(id)
     if the_memory:
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')

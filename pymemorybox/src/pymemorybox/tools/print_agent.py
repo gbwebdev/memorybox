@@ -24,7 +24,7 @@ def on_notify_agent(data):
 @sio.on('request_print')
 def on_button_clicked(data):
     print('Print request received')
-    sio.emit('agent', {
+    sio.emit('agent_response', {
         'request_id': data['request_id'],
         'status': 200,
         'message': {

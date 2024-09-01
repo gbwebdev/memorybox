@@ -36,8 +36,10 @@
     <!--<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>-->
     <script src="{{ url_for('static', filename='js/jquery-3.4.1.slim.min.js') }}" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"></script>
+    {% if current_user.is_authenticated %}
     <script src="{{ url_for('static', filename='js/socket.io.min.js') }}" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"></script>
     <script src="{{ url_for('static', filename='js/print.js') }}"></script>
+    {% endif %}
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
