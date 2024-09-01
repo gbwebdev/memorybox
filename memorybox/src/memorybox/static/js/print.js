@@ -14,7 +14,7 @@ socket.on('notify_agent', function(data) {
 });
 
 function triggerPrint(memoryId) {
-  socket.emit('print', {data: memoryId});
+  socket.emit('print', memoryId);
   console.log("Requested print for memory id ", memoryId);
   setPrintMessage("info", "Print request sent.");
 }

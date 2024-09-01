@@ -17,11 +17,12 @@ def on_notify_agent(data):
     # Perform actions in response to the notification
 
 
-
-@sio.on('print')
+@sio.on('request_print')
 def on_button_clicked(data):
-    print('Received notification from server:', data['message'])
+    print('Print request received')
+    
     # Perform actions in response to the notification
+
 
 
 def run(server: str):

@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import date, datetime, timedelta
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
@@ -48,10 +49,27 @@ def get_memory_by_date(date_value: date):
 
 # Handle button click event from the client-side
 @socketio.on('print')
-def handle_print(data):
+def handle_print(id):
+    the_memory = get_memory_by_id(id)
+    if the_memory:
+        image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
+        with open(image_path, 'rb') as f:
+            image_data = f.read()
+        emit('request_print',
+             {
+                'image_data': image_data,
+                'printer': {
+                    'mac_address:': Config().printer_mac_address,
+                    'model': Config().printer_model
+                }
+             },
+             broadcast=True)
+
+@socketio.on('agent_response')
+def handle_agent_response(data):
     print('Print button clicked:', data)
     # Notify the agent
-    emit('notify_agent', {'message': 'User clicked the button'}, broadcast=True)
+    emit('notify_agent', {'message': f'User requested a print for memory id {data}'}, broadcast=True)
 
 @bp.route('/memory-fullres/<filename>')
 @login_required
