@@ -24,6 +24,14 @@ def on_notify_agent(data):
 @sio.on('request_print')
 def on_button_clicked(data):
     print('Print request received')
+    sio.emit('agent', {
+        'request_id': data['request_id'],
+        'status': 200,
+        'message': {
+            'type': 'info',
+            'message': 'Agent received the print request.'
+        }
+    })
     
     printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
     printer.connect()

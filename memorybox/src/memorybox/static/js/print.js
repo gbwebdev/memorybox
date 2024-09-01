@@ -1,5 +1,4 @@
 const wsEndpoint = location.protocol + '//' + location.host;
-
 var socket = io.connect(wsEndpoint);
 
 $('#printButton').on('click', function(event) {
@@ -13,8 +12,23 @@ socket.on('notify_agent', function(data) {
     // Here you can perform additional actions when the agent is notified
 });
 
+// Listen for notifications from the agent
+socket.on('agent', function(data) {
+  console.log('Received data from the agent');
+  console.log(data);
+  // Here you can perform additional actions when the agent is notified
+});
+
 function triggerPrint(memoryId) {
   socket.emit('print', memoryId);
+
+  socket.emit("print", withTimeout((response) => {
+    console.log("success!");
+    console.log(response);
+  }, () => {
+    console.log("timeout!");
+  }, 1000));
+
   console.log("Requested print for memory id ", memoryId);
   setPrintMessage("info", "Print request sent.");
 }
@@ -30,5 +44,24 @@ function setPrintMessage(kind, message, duration=0) {
       $(this).hide();
       next();
    });
+  }
+}
+
+
+
+const withTimeout = (onSuccess, onTimeout, timeout) => {
+  let called = false;
+
+  const timer = setTimeout(() => {
+    if (called) return;
+    called = true;
+    onTimeout();
+  }, timeout);
+
+  return (...args) => {
+    if (called) return;
+    called = true;
+    clearTimeout(timer);
+    onSuccess.apply(this, args);
   }
 }
