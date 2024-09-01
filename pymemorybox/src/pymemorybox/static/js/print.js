@@ -16,6 +16,7 @@ socket.on('notify_agent', function(data) {
 socket.on('agent_response', function(data) {
     console.log('Received data from the agent');
     console.log(data);
+    setPrintMessage(data.request_id, data.message.type, data.message.message);
     // Here you can perform additional actions when the agent is notified
 });
 
@@ -33,7 +34,7 @@ function triggerPrint(memoryId) {
 
 function setPrintMessage(uid, kind, message, duration=0) {
 
-    var alertelem = $('[data-printid="uid"]');
+    var alertelem = $('[data-printid="'+uid+'"]');
     console.log(alertelem);
     if (alertelem.length == 0) {
         console.log("Creating div");

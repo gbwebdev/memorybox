@@ -33,9 +33,19 @@ def on_button_clicked(data):
         }
     })
     
-    printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
-    printer.connect()
-    printer.reset()
+    try:
+        printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
+        printer.connect()
+        printer.reset()
+    except bluetooth.btcommon.BluetoothError as e:
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 500,
+            'message': {
+                'type': 'error',
+                'message': 'Could not connect to the printer.'
+            }
+        })
 
     image_data = data['image_data'] # byte values of the image
     image = Image.open(io.BytesIO(image_data))

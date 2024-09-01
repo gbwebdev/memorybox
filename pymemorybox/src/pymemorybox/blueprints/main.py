@@ -71,9 +71,9 @@ def handle_print(id):
 
 @socketio.on('agent_response')
 def handle_agent_response(data):
-    print('Print button clicked:', data)
+    print('agent_response:', data)
     # Notify the agent
-    emit('notify_agent', {'message': f'User requested a print for memory id {data}'}, broadcast=True)
+    emit('agent_response', data, broadcast=True)
 
 @bp.route('/memory-fullres/<filename>')
 @login_required
