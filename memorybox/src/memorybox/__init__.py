@@ -8,17 +8,18 @@ import os
 import sys
 import click
 
-from flask import Flask, current_app
+from flask import Flask, current_app, g
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
+from flask_socketio import SocketIO
 
-
-from memorybox import blueprints
 from memorybox.config import Config
 from memorybox.login import login_manager
 
 
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
 logger = logging.getLogger("memorybox")
+
+socketio = SocketIO()
 
 def create_app(*args, **kwargs):
     """Flask application factory"""
@@ -49,7 +50,11 @@ def create_app(*args, **kwargs):
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///memorybox.db',
         ALLOWED_HOSTS=['127.0.0.1', 'localhost'],
-        REQUIRE_HTTPS=False
+        REQUIRE_HTTPS=False,
+        REMEMBER_COOKIE_DURATION=30*24*3600,
+        REMEMBER_COOKIE_SECURE=True,
+        BAN_FINDTIME = 900,
+        BANTIME=1800
     )
     app.config.from_pyfile('config.py', silent=True)
 
@@ -69,8 +74,10 @@ def create_app(*args, **kwargs):
         db.init_app(app)
         login_manager.init_app(app)
         login_manager.login_view = "auth.login"
+        socketio.init_app(app)
         logger.debug("Init app done")
-
+    
+    from memorybox import blueprints
     app.register_blueprint(blueprints.main.bp)
     app.register_blueprint(blueprints.auth.bp)
 
@@ -110,4 +117,10 @@ def init_db(reset):
     from memorybox.tools import init_db
     with current_app.app_context():
         init_db.init_db(reset)
-    
+
+@cli.command()
+def run_dev():
+    """Run in dev mode"""
+    app = create_app(mode=mode)
+    socketio = SocketIO(app)
+    socketio.run(app)

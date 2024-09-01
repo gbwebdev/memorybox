@@ -1,13 +1,15 @@
 import logging
+from datetime import date, datetime, timedelta
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
 )
 from flask_login import login_required
+from flask_socketio import emit
 from sqlalchemy import desc
-from datetime import date, timedelta
 from peripage import PrinterType
 
 # from memorybox.db import get_db
+from memorybox import socketio
 from memorybox.config import Config, MemoriesSourceType
 from memorybox.db import db
 from memorybox.model.memory import Memory
@@ -44,6 +46,13 @@ def get_memory_by_date(date_value: date):
 #     """
 #     return send_static_file('manifest.json', mimetype='application/manifest+json')
 
+# Handle button click event from the client-side
+@socketio.on('print')
+def handle_print(data):
+    print('Print button clicked:', data)
+    # Notify the agent
+    emit('notify_agent', {'message': 'User clicked the button'}, broadcast=True)
+
 @bp.route('/memory-fullres/<filename>')
 @login_required
 def memory_fullres(filename):
@@ -67,7 +76,10 @@ def index():
         return memory(todays_memory.id, True)
     else:
         latest_memory = Memory.query.order_by(desc("release_date")).first()
-        return redirect(url_for('main.memory', id=latest_memory.id))
+        if latest_memory:
+            return redirect(url_for('main.memory', id=latest_memory.id))
+        else:
+            return redirect(url_for('main.nomemory'))
 
 @bp.route('/memory/<int:id>', methods=['GET'])
 @login_required
@@ -88,6 +100,13 @@ def memory(id, today = False):
                            previous_day_memory=previous_day_memory,
                            next_day_memory=next_day_memory,
                            thumbnail_path=thumbnail_path)
+
+@bp.route('/nomemory', methods=['GET'])
+@login_required
+def nomemory():
+    """No memory page
+    """
+    return render_template('nomemory.html')
 
 @bp.route('/settings', methods=('GET', 'POST'))
 @login_required

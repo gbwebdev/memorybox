@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}No memory found{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3 p-2">
+  <div class="card">
+    <div class="card-header">
+      <h3><i class="bi bi-search"></i> No memory found</h3>
+    </div>
+    <img src="{{ url_for('static', filename='img/tumbleweed.jpg') }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <p class="card-text">Please ask the admin to load some memories.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

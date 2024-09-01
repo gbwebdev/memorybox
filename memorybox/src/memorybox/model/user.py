@@ -12,3 +12,6 @@ class User(UserMixin, db.Model):
     uid: Mapped[str]
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
+
+    def get_id(self):
+        return str(self.uid)

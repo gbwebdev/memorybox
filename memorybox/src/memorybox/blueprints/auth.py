@@ -9,7 +9,9 @@ from datetime import date, timedelta
 # from memorybox.db import get_db
 from memorybox.db import db
 from memorybox.tools.misc import url_has_allowed_host_and_scheme
+from memorybox.tools.brute_force_handling import register_login_attempt
 from memorybox.model.user import User
+from memorybox.model.login_attempt import LoginAttempt
 
 logger = logging.getLogger("memorybox")
 
@@ -23,6 +25,8 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
+
+        register_login_attempt(username, request.remote_addr)
 
         user = User.query.filter_by(username=username).first()
 

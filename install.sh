@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   echo "Please run this script using sudo and/or as root"
   exit 1
@@ -15,7 +17,7 @@ function run_as_user {
 
 echo "o Installing dependencies..."
 apt update
-apt install -y python3-venv
+apt install -y python3-venv git build-essential python3-dev sqlite3
 apt install -y libbluetooth-dev
 apt install -y libopenjp2-7 libtiff5-dev libtiff6
 echo "  ...done."

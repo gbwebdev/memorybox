@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  memorybox:
+    image: docker-registry.home.gbweb.fr/memorybox:0.1.1
+    container_name: memorybox
+    environment:
+      - GUNICORN_WORKERS=2
+      - GUNICORN_PORT=8000
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/var/www/memorybox
+      - ./memories-drop:/mnt/memories-drop
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3005:8000"
+    restart: unless-stopped
+    logging:
+      driver: "journald"
+      options:
+        tag: memorybox
