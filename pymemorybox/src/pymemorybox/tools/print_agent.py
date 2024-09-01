@@ -44,7 +44,7 @@ def on_button_clicked(data):
             'request_id': data['request_id'],
             'status': 500,
             'message': {
-                'type': 'error',
+                'type': 'danger',
                 'message': 'Could not connect to the printer.'
             }
         })
