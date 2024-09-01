@@ -39,7 +39,7 @@ fi
 echo "  ...done."
 
 echo "o Installing memorybox python package..."
-run_as_user "source venv/bin/activate && pip install ./memorybox"
+run_as_user "source venv/bin/activate && pip install ./pymemorybox"
 echo "  ...done."
 
 echo "> Installation complete !"
