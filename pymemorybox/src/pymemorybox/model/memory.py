@@ -2,7 +2,7 @@ from sqlalchemy import Integer, String, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from datetime import date
-from memorybox.db import db
+from pymemorybox.db import db
 
 class Memory(db.Model):
     """Model for a "memory" (a picture)"""

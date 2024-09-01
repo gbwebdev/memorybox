@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 from werkzeug.middleware.proxy_fix import ProxyFix
-from memorybox import create_app
+from pymemorybox import create_app
 
 PROXY_X_FOR=int(getenv('PROXY_X_FOR', '0'))
 PROXY_X_PROTO=int(getenv('PROXY_X_PROTO', '0'))

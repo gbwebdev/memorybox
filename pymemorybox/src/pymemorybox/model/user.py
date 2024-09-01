@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from flask_login import UserMixin
 
 from datetime import date
-from memorybox.db import db
+from pymemorybox.db import db
 
 class User(UserMixin, db.Model):
     """Model for a "memory" (a picture)"""

@@ -1,5 +1,5 @@
 [project]
-name = "memorybox"
+name = "pymemorybox"
 dynamic = ["version"]
 authors = [
   { name="Guillaume BITON", email="guillaume@gbweb.fr" },
@@ -44,14 +44,14 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
-memorybox = "memorybox:cli"
+memorybox = "pymemorybox:cli"
 
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.package-data]
-memorybox = [
+pymemorybox = [
     "static/**/*",
     "templates/**/*",
     "templates/*"

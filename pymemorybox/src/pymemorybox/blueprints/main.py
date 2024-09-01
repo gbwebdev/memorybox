@@ -11,10 +11,10 @@ from sqlalchemy import desc
 from peripage import PrinterType
 
 # from memorybox.db import get_db
-from memorybox import socketio
-from memorybox.config import Config, MemoriesSourceType
-from memorybox.db import db
-from memorybox.model.memory import Memory
+from pymemorybox import socketio
+from pymemorybox.config import Config, MemoriesSourceType
+from pymemorybox.db import db
+from pymemorybox.model.memory import Memory
 
 logger = logging.getLogger("memorybox")
 
@@ -51,7 +51,7 @@ def get_memory_by_date(date_value: date):
 # Handle button click event from the client-side
 @socketio.on('print')
 def handle_print(id):
-    uid = uuid.uuid4()
+    uid = str(uuid.uuid4())
     the_memory = get_memory_by_id(id)
     if the_memory:
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
@@ -59,7 +59,7 @@ def handle_print(id):
             image_data = f.read()
         emit('request_print',
              {
-                'request_id': uuid.uuid4(),
+                'request_id': uid,
                 'image_data': image_data,
                 'printer': {
                     'mac_address': Config().printer_mac_address,

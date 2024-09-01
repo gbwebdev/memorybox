@@ -7,11 +7,11 @@ from flask_login import login_user, logout_user, login_required
 from datetime import date, timedelta
 
 # from memorybox.db import get_db
-from memorybox.db import db
-from memorybox.tools.misc import url_has_allowed_host_and_scheme
-from memorybox.tools.brute_force_handling import register_login_attempt
-from memorybox.model.user import User
-from memorybox.model.login_attempt import LoginAttempt
+from pymemorybox.db import db
+from pymemorybox.tools.misc import url_has_allowed_host_and_scheme
+from pymemorybox.tools.brute_force_handling import register_login_attempt
+from pymemorybox.model.user import User
+from pymemorybox.model.login_attempt import LoginAttempt
 
 logger = logging.getLogger("memorybox")
 

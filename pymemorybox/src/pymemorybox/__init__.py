@@ -12,8 +12,8 @@ from flask import Flask, current_app, g
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 from flask_socketio import SocketIO
 
-from memorybox.config import Config
-from memorybox.login import login_manager
+from pymemorybox.config import Config
+from pymemorybox.login import login_manager
 
 
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
@@ -70,14 +70,14 @@ def create_app(*args, **kwargs):
     
     with app.app_context():
         Config()
-        from memorybox.db import db
+        from pymemorybox.db import db
         db.init_app(app)
         login_manager.init_app(app)
         login_manager.login_view = "auth.login"
         socketio.init_app(app)
         logger.debug("Init app done")
     
-    from memorybox import blueprints
+    from pymemorybox import blueprints
     app.register_blueprint(blueprints.main.bp)
     app.register_blueprint(blueprints.auth.bp)
 
@@ -100,7 +100,7 @@ def cli(script_info, mode):
 def fetch_memories():
     """Retreive memories from external source"""
     logger.info("Fetching memories")
-    from memorybox.tools.fetch_memories import fetch_memories as fetch_memories_func
+    from pymemorybox.tools.fetch_memories import fetch_memories as fetch_memories_func
     fetch_memories_func()
 
 @cli.command()
@@ -114,15 +114,14 @@ def fetch_memories():
 def init_db(reset):
     """Initialize the databse"""
     logger.info("Initializing database")
-    from memorybox.tools import init_db
+    from pymemorybox.tools import init_db
     with current_app.app_context():
         init_db.init_db(reset)
 
 @cli.command()
 def run_dev():
     """Run in dev mode"""
-    app = create_app(mode=mode)
-    socketio = SocketIO(app)
+    app = create_app(mode="dev")
     socketio.run(app)
 
 @cli.command()
@@ -135,5 +134,10 @@ def run_dev():
 def run_print_agent(server):
     """Run the print agent"""
     logger.info("Running the print agent.")
-    from memorybox.tools import print_agent
+    from pymemorybox.tools import print_agent
     print_agent.run(server)
+
+
+def main():
+    app = create_app(mode="dev")
+    socketio.run(app, host="0.0.0.0", port=8000, debug=True)

@@ -1,5 +1,5 @@
 from flask_login import LoginManager
-from memorybox.model.user import User
+from pymemorybox.model.user import User
 login_manager = LoginManager()
 
 @login_manager.user_loader

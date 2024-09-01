@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import or_
 from flask import current_app
 
-from memorybox.db import db
-from memorybox.model.login_attempt import LoginAttempt
+from pymemorybox.db import db
+from pymemorybox.model.login_attempt import LoginAttempt
 
 def register_login_attempt(username: str, ipaddress: str, success: bool):
     old_attempts = LoginAttempt.query.filter(LoginAttempt.datetime < datetime.now() - timedelta(seconds=current_app.config['BAN_FINDTIME']) ).all()

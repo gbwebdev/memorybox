@@ -20,9 +20,9 @@ socket.on('agent', function(data) {
 });
 
 function triggerPrint(memoryId) {
-  socket.emit('print', memoryId);
+  //socket.emit('print', memoryId);
 
-  socket.emit("print", withTimeout((response) => {
+  socket.emit("print", memoryId, withTimeout((response) => {
     console.log("success!");
     console.log(response);
   }, () => {

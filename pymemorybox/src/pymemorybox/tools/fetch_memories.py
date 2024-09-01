@@ -9,9 +9,9 @@ from flask import current_app
 
 from PIL import Image
 
-from memorybox.config import Config, MemoriesSourceType
-from memorybox.model.memory import Memory
-from memorybox.db import db
+from pymemorybox.config import Config, MemoriesSourceType
+from pymemorybox.model.memory import Memory
+from pymemorybox.db import db
 
 
 def _fetch_memories_from_local_directory():

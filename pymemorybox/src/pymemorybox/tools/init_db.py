@@ -1,7 +1,7 @@
 from flask import current_app
 
-from memorybox.db import db
-from memorybox.model import memory
+from pymemorybox.db import db
+from pymemorybox.model import memory
 
 def init_db(drop=False):
     with current_app.app_context():
