@@ -59,8 +59,8 @@ def handle_print(id):
              {
                 'image_data': image_data,
                 'printer': {
-                    'mac_address:': Config().printer_mac_address,
-                    'model': Config().printer_model
+                    'mac_address': Config().printer_mac_address,
+                    'model': Config().printer_model.name
                 }
              },
              broadcast=True)

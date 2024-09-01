@@ -1,4 +1,8 @@
 import socketio
+import peripage
+
+from PIL import Image
+import io
 
 # Create a Socket.IO client
 sio = socketio.Client()
@@ -21,7 +25,18 @@ def on_notify_agent(data):
 def on_button_clicked(data):
     print('Print request received')
     
-    # Perform actions in response to the notification
+    printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
+    printer.connect()
+    printer.reset()
+
+    image_data = data['image_data'] # byte values of the image
+    image = Image.open(io.BytesIO(image_data))
+    image.show()
+
+    printer.setConcentration(1)
+
+    printer.printImage(image)
+    printer.printBreak(150)
 
 
 
