@@ -124,3 +124,16 @@ def run_dev():
     app = create_app(mode=mode)
     socketio = SocketIO(app)
     socketio.run(app)
+
+@cli.command()
+@cli.option('-s',
+            '--server',
+            required=True,
+            type=str,
+            envvar='MEMORYBOX_SERVER',
+            helper="Memorybox server address.")
+def run_print_agent(server):
+    """Run the print agent"""
+    logger.info("Running the print agent.")
+    from memorybox.tools import print_agent
+    print_agent.run(server)

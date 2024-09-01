@@ -29,7 +29,9 @@ dependencies = [
   "toml",
   "gunicorn",
   "flask-socketio",
-  "eventlet"
+  "eventlet",
+  "websocket-client",
+  "python-socketio"
 ]
 
 [project.urls]
