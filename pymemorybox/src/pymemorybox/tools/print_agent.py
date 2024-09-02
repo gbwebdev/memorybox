@@ -107,6 +107,7 @@ def on_button_clicked(data):
             }
         })
         return False
+    printer.disconnect()
 
 def run(server: str):
     """Run the agent"""
