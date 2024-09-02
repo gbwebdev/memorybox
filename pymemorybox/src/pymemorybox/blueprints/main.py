@@ -154,10 +154,13 @@ def settings():
         config.memories_repository = data.get('memoriesRepoAddress')
         config.memories_repository_ignore_certificate = data.get('memoriesRepoIgnoreCertificate', 'false') == 'true'
 
-        config.enable_daily_printing = data.get('enablePrinting', 'false') == 'true'
+        config.enable_printing = data.get('enablePrinting', 'false') == 'true'
         config.printer_model = PrinterType[data.get('printerType')]
         config.printer_mac_address = data.get('printerMacAddress')
+        config.optimize_orientation = data.get('optimizeOrientation')
+        config.print_captation = data.get('printCaptation')
 
+        config.enable_daily_printing = data.get('enableDailyPrinting', 'false') == 'true'
         config.workday_print_time = datetime.strptime(data.get('workdayPrintTime')[:5], '%H:%M').time()
         config.holiday_print_time = datetime.strptime(data.get('holidayPrintTime')[:5], '%H:%M').time()
         config.enable_holiday_mode = data.get('enableHolidayMode', 'false') == 'true'

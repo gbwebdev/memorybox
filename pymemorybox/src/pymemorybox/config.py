@@ -32,12 +32,15 @@ class Config(metaclass=Singleton):
         self._memories_local_path = None
         self._memories_repository = None
         self._memories_repository_ignore_certificate = False
+        self._enable_printing = False
         self._enable_daily_printing = False
         self._workday_print_time = datetime.time(hour=8, minute=0)
         self._holiday_print_time = datetime.time(hour=9, minute=30)
         self._enable_holiday_mode = False
         self._printer_mac_address = "01:23:45:67:89:AF"
         self._printer_model = PrinterType.A6p
+        self._optimize_orientation = True
+        self._print_captation = True
 
         self.load_conf()
 
@@ -55,14 +58,21 @@ class Config(metaclass=Singleton):
                     'ignore_certificate': self._memories_repository_ignore_certificate
                 }
             },
-            'daily_printing': {
-                'enabled': self._enable_daily_printing,
+            'printing':{
+                'enabled': self._enable_printing,
                 'settings': {
-                    'workday_print_time': self._workday_print_time.strftime('%H:%M'),
-                    'holiday_print_time': self._holiday_print_time.strftime('%H:%M'),
-                    'holiday_mode_enabled': self._enable_holiday_mode,
                     'printer_mac_address': self._printer_mac_address,
-                    'printer_model': self._printer_model.name
+                    'printer_model': self._printer_model.name,
+                    'optimize_orientation': self._optimize_orientation,
+                    'print_captation': self._print_captation,
+                    'daily_printing': {
+                        'enabled': self._enable_daily_printing,
+                        'settings': {
+                            'workday_print_time': self._workday_print_time.strftime('%H:%M'),
+                            'holiday_print_time': self._holiday_print_time.strftime('%H:%M'),
+                            'holiday_mode_enabled': self._enable_holiday_mode
+                        }
+                    }
                 }
             }
         }
@@ -86,10 +96,22 @@ class Config(metaclass=Singleton):
             self._memories_repository_ignore_certificate = picture_source.get('repository', {}) \
                                             .get('ignore_certificate',
                                                 self._memories_repository_ignore_certificate)
+            
+            printing = config_data.get('printing', {})
+            self._enable_printing = printing.get('enabled', self._enable_printing)
+            printing_settings = printing.get('settings', {})
+            self._printer_mac_address = printing_settings.get('printer_mac_address',
+                                                              self._printer_mac_address)
+            self._printer_model = PrinterType[printing_settings.get('printer_model',
+                                                                    self._printer_model.name)]
+            self._optimize_orientation = printing_settings.get('optimize_orientation',
+                                                               self._optimize_orientation)
+            self._print_captation = printing_settings.get('print_captation',
+                                                               self._print_captation)
 
-            daily_printing = config_data.get('daily_printing', {})
+            daily_printing = printing_settings.get('daily_printing', {})
             self._enable_daily_printing = daily_printing.get('enabled', self._enable_daily_printing)
-            daily_printing_settings = daily_printing.get('settings', {})
+            daily_printing_settings = printing_settings.get('settings', {})
             self._workday_print_time = datetime.datetime.strptime(
                     daily_printing_settings.get('workday_print_time',
                                                 self._workday_print_time.strftime('%H:%M')),
@@ -102,10 +124,6 @@ class Config(metaclass=Singleton):
                 ).time()
             self._enable_holiday_mode = daily_printing_settings.get('holiday_mode_enabled',
                                                                     self._enable_holiday_mode)
-            self._printer_mac_address = daily_printing_settings.get('printer_mac_address',
-                                                                    self._printer_mac_address)
-            self._printer_model = PrinterType[daily_printing_settings.get('printer_model',
-                                                                        self._printer_model.name)]
         except FileNotFoundError:
             print("Config file does not exist yet.")
 
@@ -165,6 +183,17 @@ class Config(metaclass=Singleton):
     @memories_repository_ignore_certificate.setter
     def memories_repository_ignore_certificate(self, memories_repository_ignore_certificate: bool):
         self._memories_repository_ignore_certificate = memories_repository_ignore_certificate
+        self._handle_autosave()
+
+    @property
+    def enable_printing(self) -> bool:
+        """Enable printing.
+        """
+        return self._enable_printing
+
+    @enable_printing.setter
+    def enable_printing(self, enable_printing: bool):
+        self._enable_printing = enable_printing
         self._handle_autosave()
 
     @property
@@ -232,4 +261,26 @@ class Config(metaclass=Singleton):
     @printer_model.setter
     def printer_model(self, printer_model: PrinterType):
         self._printer_model = printer_model
+        self._handle_autosave()
+
+    @property
+    def optimize_orientation(self) -> bool:
+        """Optimize image orientation (rotate if picture is wider than height).
+        """
+        return self._optimize_orientation
+
+    @optimize_orientation.setter
+    def optimize_orientation(self, optimize_orientation: bool):
+        self._optimize_orientation = optimize_orientation
+        self._handle_autosave()
+
+    @property
+    def print_captation(self) -> bool:
+        """Print the captation with the picture.
+        """
+        return self._print_captation
+
+    @print_captation.setter
+    def print_captation(self, print_captation: bool):
+        self._print_captation = print_captation
         self._handle_autosave()

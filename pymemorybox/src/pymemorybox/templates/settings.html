@@ -58,12 +58,12 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <input class="form-check-input" type="checkbox" value="true" id="enablePrinting" name="enablePrinting" {% if settings.enable_daily_printing %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" value="true" id="enablePrinting" name="enablePrinting" {% if settings.enable_printing %}checked{% endif %}>
                             <label for="enablePrinting" class="form-label">
-                                Enable daily printing
+                                Enable printing
                             </label>
                         </div>
-                        <div class="card my-1" {% if not settings.enable_daily_printing %}style="display: none;"{% endif %}>
+                        <div class="card my-1" {% if not settings.enable_printing %}style="display: none;"{% endif %}>
                             <div class="card-header">
                                 <i class="bi bi-sliders2"></i> Printing settings
                             </div>
@@ -81,18 +81,44 @@
                                     <input type="text" class="form-control" id="printerMacAddress" name="printerMacAddress" value="{{ settings.printer_mac_address }}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="workdayPrintTime" class="form-label">Print Time (workdays)</label>
-                                    <input type="time" class="form-control" id="workdayPrintTime" name="workdayPrintTime" step="900" value="{{ settings.workday_print_time }}" required>
+                                    <input class="form-check-input" type="checkbox" value="true" id="optimizeOrientation" name="optimizeOrientation" {% if settings.optimize_orientation %}checked{% endif %}>
+                                    <label for="optimizeOrientation" class="form-label">
+                                        Optimize orientation (rotate if width is larger than height)
+                                    </label>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="holidayPrintTime" class="form-label">Print Time (weekends and holidays)</label>
-                                    <input type="time" class="form-control" id="holidayPrintTime" name="holidayPrintTime" value="{{ settings.holiday_print_time }}" step="900" required>
+                                    <input class="form-check-input" type="checkbox" value="true" id="printCaptation" name="printCaptation" {% if settings.print_captation %}checked{% endif %}>
+                                    <label for="printCaptation" class="form-label">
+                                        Print captation
+                                    </label>
                                 </div>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="checkbox" value="true" id="enableHolidayMode" name="enableHolidayMode" {% if settings.enable_holiday_mode %}checked{% endif %}>
-                                  <label for="enableHolidayMode" class="form-label">
-                                    Enable Holidays Mode
-                                  </label>
+                                
+                                <div class="mb-3">
+                                    <input class="form-check-input" type="checkbox" value="true" id="enableDailyPrinting" name="enableDailyPrinting" {% if settings.enable_daily_printing %}checked{% endif %}>
+                                    <label for="enableDailyPrinting" class="form-label">
+                                        Enable daily printing
+                                    </label>
+                                </div>
+                                <div class="card my-1" {% if not settings.enable_daily_printing %}style="display: none;"{% endif %}>
+                                    <div class="card-header">
+                                        <i class="bi bi-sliders2"></i> Daily printing settings
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="workdayPrintTime" class="form-label">Print Time (workdays)</label>
+                                            <input type="time" class="form-control" id="workdayPrintTime" name="workdayPrintTime" step="900" value="{{ settings.workday_print_time }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="holidayPrintTime" class="form-label">Print Time (weekends and holidays)</label>
+                                            <input type="time" class="form-control" id="holidayPrintTime" name="holidayPrintTime" value="{{ settings.holiday_print_time }}" step="900" required>
+                                        </div>
+                                        <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" id="enableHolidayMode" name="enableHolidayMode" {% if settings.enable_holiday_mode %}checked{% endif %}>
+                                        <label for="enableHolidayMode" class="form-label">
+                                            Enable Holidays Mode
+                                        </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
