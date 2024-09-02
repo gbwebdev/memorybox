@@ -17,18 +17,12 @@ def connect():
 def disconnect():
     print('Disconnected from server')
 
-@sio.on('notify_agent')
-def on_notify_agent(data):
-    print('Received notification from server:', data['message'])
-    # Perform actions in response to the notification
-
-
 @sio.on('request_print')
 def on_button_clicked(data):
     print('Print request received')
     sio.emit('agent_response', {
         'request_id': data['request_id'],
-        'status': 200,
+        'status': 100,
         'message': {
             'type': 'info',
             'message': 'Agent received the print request.'
@@ -39,6 +33,14 @@ def on_button_clicked(data):
         printer = peripage.Printer(data['printer']['mac_address'], peripage.PrinterType[data['printer']['model']])
         printer.connect()
         printer.reset()
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 100,
+            'message': {
+                'type': 'info',
+                'message': 'Connected to the printer.'
+            }
+        })
     except BluetoothError as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
@@ -48,17 +50,63 @@ def on_button_clicked(data):
                 'message': 'Could not connect to the printer.'
             }
         })
+        return False
+    except Exception as e:
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 500,
+            'message': {
+                'type': 'danger',
+                'message': f'Could not connect to the printer ({e})'
+            }
+        })
+        return False
 
-    image_data = data['image_data'] # byte values of the image
-    image = Image.open(io.BytesIO(image_data))
-    image.show()
-
-    printer.setConcentration(1)
-
-    printer.printImage(image)
-    printer.printBreak(150)
-
-
+    try:
+        image_data = data['image_data'] # byte values of the image
+        image = Image.open(io.BytesIO(image_data))
+        image.show()
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 100,
+            'message': {
+                'type': 'info',
+                'message': 'Picture processed.'
+            }
+        })
+    except Exception as e:
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 500,
+            'message': {
+                'type': 'danger',
+                'message': f'Could not process the picture ({e})'
+            }
+        })
+        return False
+    
+    try:
+        printer.setConcentration(1)
+        printer.printImage(image)
+        printer.printBreak(150)
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 200,
+            'message': {
+                'type': 'success',
+                'message': 'Memory printed !'
+            }
+        })
+    except Exception as e:
+        sio.emit('agent_response', {
+            'request_id': data['request_id'],
+            'status': 500,
+            'message': {
+                'type': 'danger',
+                'message': f'Could not print the picture ({e})'
+            }
+        })
+        return False
 
 def run(server: str):
     """Run the agent"""
