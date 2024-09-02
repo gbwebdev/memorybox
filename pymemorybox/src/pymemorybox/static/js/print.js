@@ -3,7 +3,13 @@ var socket = io.connect(wsEndpoint);
 
 $('#printButton').on('click', function(event) {
     console.log("Print button clicked !");
-    triggerPrint($(this).data('memory'));
+    var print = true;
+    if($(this).data('printed') == "True"){
+        print = confirm('This picture has already been printed. Are you sure you want to print it again ?');
+    }
+    if(print){
+        triggerPrint($(this).data('memory'));
+    }
 });
 
 // Listen for notifications from the server
@@ -22,7 +28,8 @@ socket.on('agent_response', function(data) {
 
 function triggerPrint(memoryId) {
     //socket.emit('print', memoryId);
-    $('#printButton').prop("disabled",true);
+
+    $('#printButton').prop("disabled", true);
     socket.emit("print", memoryId, withTimeout((response) => {
         setPrintMessage(response, "info", "Print request sent.");
     }, () => {

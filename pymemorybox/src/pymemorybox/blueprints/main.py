@@ -60,6 +60,7 @@ def handle_print(id):
         emit('request_print',
              {
                 'request_id': uid,
+                'memory_id': id,
                 'image_data': image_data,
                 'printer': {
                     'mac_address': Config().printer_mac_address,
@@ -71,7 +72,15 @@ def handle_print(id):
 
 @socketio.on('agent_response')
 def handle_agent_response(data):
-    print('agent_response:', data)
+    current_app.logger.debug('agent_response :')
+    current_app.logger.debug(data)
+    if data.get('status', 0) == 200:
+        if 'memory_id' in data:
+            memory = get_memory_by_id(data['memory_id'])
+            if memory:
+                memory.printed = True
+                db.session.commit()
+
     # Notify the agent
     emit('agent_response', data, broadcast=True)
 

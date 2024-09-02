@@ -20,8 +20,11 @@ def disconnect():
 @sio.on('request_print')
 def on_button_clicked(data):
     print('Print request received')
+    print(data)
+    return
     sio.emit('agent_response', {
         'request_id': data['request_id'],
+        'memory_id': data['memory_id'],
         'status': 100,
         'message': {
             'type': 'info',
@@ -35,6 +38,7 @@ def on_button_clicked(data):
         printer.reset()
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 100,
             'message': {
                 'type': 'info',
@@ -44,6 +48,7 @@ def on_button_clicked(data):
     except BluetoothError as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 500,
             'message': {
                 'type': 'danger',
@@ -54,6 +59,7 @@ def on_button_clicked(data):
     except Exception as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 500,
             'message': {
                 'type': 'danger',
@@ -68,6 +74,7 @@ def on_button_clicked(data):
         image.show()
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 100,
             'message': {
                 'type': 'info',
@@ -77,6 +84,7 @@ def on_button_clicked(data):
     except Exception as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 500,
             'message': {
                 'type': 'danger',
@@ -91,6 +99,7 @@ def on_button_clicked(data):
         printer.printBreak(150)
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 200,
             'message': {
                 'type': 'success',
@@ -100,6 +109,7 @@ def on_button_clicked(data):
     except Exception as e:
         sio.emit('agent_response', {
             'request_id': data['request_id'],
+            'memory_id': data['memory_id'],
             'status': 500,
             'message': {
                 'type': 'danger',
