@@ -20,8 +20,6 @@ def disconnect():
 @sio.on('request_print')
 def on_button_clicked(data):
     print('Print request received')
-    print(data)
-    return
     sio.emit('agent_response', {
         'request_id': data['request_id'],
         'memory_id': data['memory_id'],
