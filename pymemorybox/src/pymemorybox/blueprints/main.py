@@ -52,7 +52,7 @@ def get_memory_by_date(date_value: date):
 @socketio.on('connect')
 def connect():
     token = request.args.get('token', request.headers.get('token'))
-
+    current_app.logger.info(f"Token : {token}")
     if token is None:
         return False  # Reject the connection
 

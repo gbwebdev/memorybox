@@ -57,7 +57,7 @@ def create_app(*args, **kwargs):
         BAN_FINDTIME = 900,
         BANTIME=1800
     )
-    app.config.from_pyfile('config.py', silent=True)
+    app.config.from_pyfile('config.py')
 
     # ensure the instance folder exists
     app.config['memories_path'] = os.path.join(app.instance_path, 'memories')

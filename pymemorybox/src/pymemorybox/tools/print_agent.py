@@ -120,7 +120,7 @@ def on_button_clicked(data):
 def run(server: str, token: str):
     """Run the agent"""
     # Connect to the Flask-SocketIO server
-    sio.connect(server, headers={token: token}, transports=['websocket'])
+    sio.connect(server, headers={'token': token}, transports=['websocket'])
 
     # Keep the client running to listen for events
     sio.wait()
