@@ -79,8 +79,7 @@ def handle_print(id):
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
         with open(image_path, 'rb') as f:
             image_data = f.read()
-        emit('request_print',
-             {
+        payload = {
                 'request_id': uid,
                 'memory_id': id,
                 'image_data': image_data,
@@ -88,8 +87,10 @@ def handle_print(id):
                     'mac_address': Config().printer_mac_address,
                     'model': Config().printer_model.name
                 }
-             },
-             broadcast=True)
+             }
+        if Config().print_captation:
+            payload['captation'] = the_memory.captation
+        emit('request_print', payload, broadcast=True)
         return uid
 
 @socketio.on('agent_response')

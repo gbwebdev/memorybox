@@ -19,7 +19,7 @@ def disconnect():
     exit(1)
 
 @sio.on('request_print')
-def on_button_clicked(data):
+def on_print_requested(data):
     print('Print request received')
     sio.emit('agent_response', {
         'request_id': data['request_id'],
@@ -51,7 +51,7 @@ def on_button_clicked(data):
             'status': 500,
             'message': {
                 'type': 'danger',
-                'message': 'Could not connect to the printer.'
+                'message': 'Could not connect to the printer ({e})'
             }
         })
         return False
@@ -95,6 +95,9 @@ def on_button_clicked(data):
     try:
         printer.setConcentration(1)
         printer.printImage(image)
+        if 'captation' in data:
+            printer.printBreak(100)
+            printer.printASCII(data['captation'])
         printer.printBreak(150)
         sio.emit('agent_response', {
             'request_id': data['request_id'],
