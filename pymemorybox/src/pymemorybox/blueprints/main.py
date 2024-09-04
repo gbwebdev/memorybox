@@ -88,8 +88,10 @@ def handle_print(id):
                     'model': Config().printer_model.name
                 }
              }
+        current_app.logger.debug(Config().print_captation)
         if Config().print_captation:
             payload['captation'] = the_memory.captation
+        current_app.logger.debug(payload)
         emit('request_print', payload, broadcast=True)
         return uid
 

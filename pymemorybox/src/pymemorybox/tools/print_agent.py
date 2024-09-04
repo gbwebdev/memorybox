@@ -97,7 +97,7 @@ def on_print_requested(data):
         printer.printImage(image)
         if 'captation' in data:
             printer.printBreak(100)
-            printer.printASCII(data['captation'])
+            printer.printlnASCII(data['captation'])
         printer.printBreak(150)
         sio.emit('agent_response', {
             'request_id': data['request_id'],
