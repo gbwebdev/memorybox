@@ -16,6 +16,7 @@ def connect():
 @sio.event
 def disconnect():
     print('Disconnected from server')
+    exit(1)
 
 @sio.on('request_print')
 def on_button_clicked(data):
