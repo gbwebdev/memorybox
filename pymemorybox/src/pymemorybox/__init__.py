@@ -123,6 +123,7 @@ def init_db(reset):
 @cli.command()
 def run_dev():
     """Run in dev mode"""
+    logger.info("Running the dev server.")
     app = create_app(mode="dev")
     socketio.run(app)
 
