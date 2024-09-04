@@ -32,7 +32,10 @@ dependencies = [
   "eventlet",
   "websocket-client",
   "python-socketio",
-  'uuid'
+  'uuid',
+  "pyjwt",
+  "Flask-JWT-Extended",
+  "APScheduler"
 ]
 
 [project.urls]

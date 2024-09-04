@@ -3,11 +3,13 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory, abort
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
+from flask_jwt_extended import  create_access_token
 from datetime import date, timedelta
 
 # from memorybox.db import get_db
 from pymemorybox.db import db
+from pymemorybox import jwt
 from pymemorybox.tools.misc import url_has_allowed_host_and_scheme
 from pymemorybox.tools.brute_force_handling import register_login_attempt
 from pymemorybox.model.user import User
@@ -39,6 +41,9 @@ def login():
         # Login and validate the user.
         # user should be an instance of your `User` class
         login_user(user, remember=remember)
+
+        session['jwt_token'] = create_access_token(identity=username)
+
 
         _next = request.args.get('next')
         # url_has_allowed_host_and_scheme should check if the url is safe

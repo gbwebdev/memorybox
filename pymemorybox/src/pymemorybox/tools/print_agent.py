@@ -117,10 +117,10 @@ def on_button_clicked(data):
         return False
     printer.disconnect()
 
-def run(server: str):
+def run(server: str, token: str):
     """Run the agent"""
     # Connect to the Flask-SocketIO server
-    sio.connect(server, transports=['websocket'])
+    sio.connect(server + "?token=" + token, transports=['websocket'])
 
     # Keep the client running to listen for events
     sio.wait()

@@ -11,7 +11,7 @@ import click
 from flask import Flask, current_app, g
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 from flask_socketio import SocketIO
-
+from flask_jwt_extended import JWTManager
 from pymemorybox.config import Config
 from pymemorybox.login import login_manager
 
@@ -20,6 +20,7 @@ logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO').upper())
 logger = logging.getLogger("memorybox")
 
 socketio = SocketIO()
+jwt = JWTManager()
 
 def create_app(*args, **kwargs):
     """Flask application factory"""
@@ -75,6 +76,7 @@ def create_app(*args, **kwargs):
         login_manager.init_app(app)
         login_manager.login_view = "auth.login"
         socketio.init_app(app)
+        jwt.init_app(app)
         logger.debug("Init app done")
     
     from pymemorybox import blueprints
@@ -131,11 +133,17 @@ def run_dev():
             type=str,
             envvar='MEMORYBOX_SERVER',
             help="Memorybox server address.")
-def run_print_agent(server):
+@click.option('-t',
+            '--token',
+            required=True,
+            type=str,
+            envvar='MEMORYBOX_AGENT_TOKEN',
+            help="Token for the agent to authenticate against the server.")
+def run_print_agent(server, token):
     """Run the print agent"""
     logger.info("Running the print agent.")
     from pymemorybox.tools import print_agent
-    print_agent.run(server)
+    print_agent.run(server, token)
 
 
 def main():

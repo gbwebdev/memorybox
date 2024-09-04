@@ -1,5 +1,9 @@
 const wsEndpoint = location.protocol + '//' + location.host;
-var socket = io.connect(wsEndpoint);
+const token = localStorage.getItem('token');
+var socket = io.connect(wsEndpoint, {
+    query: { token }
+});
+
 
 $('#printButton').on('click', function(event) {
     console.log("Print button clicked !");
@@ -33,7 +37,7 @@ function triggerPrint(memoryId) {
     socket.emit("print", memoryId, withTimeout((response) => {
         setPrintMessage(response, "info", "Print request sent.");
     }, () => {
-        setPrintMessage("UNKNOWN", "error", "Server did not respond.");
+        setPrintMessage("UNKNOWN", "danger", "Server did not respond.");
     }, 5000));
 
     console.log("Requested print for memory id ", memoryId);
@@ -42,13 +46,11 @@ function triggerPrint(memoryId) {
 function setPrintMessage(uid, kind, message, duration=0) {
 
     var alertelem = $('[data-printid="'+uid+'"]');
-    console.log(alertelem);
     if (alertelem.length == 0) {
         console.log("Creating div");
         $("#printStatuses").append('<div data-printid="' + uid + '"></div>');
         alertelem = $('[data-printid="'+uid+'"]');
     }
-    console.log(alertelem)
     alertelem.removeClass();
     alertelem.addClass('alert');
     alertelem.addClass('alert-' + kind);

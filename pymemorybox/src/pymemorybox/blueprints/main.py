@@ -6,7 +6,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
 )
 from flask_login import login_required
-from flask_socketio import emit
+from flask_socketio import emit, disconnect
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from sqlalchemy import desc
 from peripage import PrinterType
 
@@ -47,6 +48,27 @@ def get_memory_by_date(date_value: date):
 #     """Serve PWA manifest
 #     """
 #     return send_static_file('manifest.json', mimetype='application/manifest+json')
+
+@socketio.on('connect')
+def connect():
+    token = request.args.get('token')
+
+    if token is None:
+        return False  # Reject the connection
+
+    if token == current_app.config["AGENT_TOKEN"]:
+        current_app.logger.info(f"Agent connected.")
+    else:
+        try:
+            current_app.logger.debug(token)
+            decoded_token = decode_token(token)
+            current_app.logger.debug(decoded_token)
+            identity = decoded_token['sub']  # 'sub' is the default key for identity in JWT
+            current_app.logger.info(f"User {identity} connected.")
+        except Exception as e:
+            current_app.logger.error(f"Connection refused: {str(e)}")
+            disconnect()
+            return False
 
 # Handle button click event from the client-side
 @socketio.on('print')

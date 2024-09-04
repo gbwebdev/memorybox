@@ -13,5 +13,9 @@ class User(UserMixin, db.Model):
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
 
+    def __init__(self):
+        self._token = None
+        super().__init__()
+
     def get_id(self):
         return str(self.uid)
