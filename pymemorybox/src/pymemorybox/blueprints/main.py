@@ -16,6 +16,8 @@ from pymemorybox import socketio
 from pymemorybox.config import Config, MemoriesSourceType
 from pymemorybox.db import db
 from pymemorybox.model.memory import Memory
+from pymemorybox.tools.string_processing import remove_accents
+
 
 logger = logging.getLogger("memorybox")
 
@@ -88,9 +90,8 @@ def handle_print(id):
                     'model': Config().printer_model.name
                 }
              }
-        current_app.logger.debug(Config().print_captation)
         if Config().print_captation:
-            payload['captation'] = the_memory.captation
+            payload['captation'] = remove_accents(the_memory.captation)
         current_app.logger.debug(payload)
         emit('request_print', payload, broadcast=True)
         return uid

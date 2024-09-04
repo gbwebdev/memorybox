@@ -6,15 +6,6 @@ import io
 
 from bluetooth.btcommon import BluetoothError
 
-from pymemorybox.tools.string_processing import remove_accents
-
-def remove_accents(input_str):
-    # Normalize the string to decomposed form (NFD)
-    nfkd_form = unicodedata.normalize('NFD', input_str)
-    
-    # Filter out combining characters (accents, etc.)
-    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
-
 # Create a Socket.IO client
 sio = socketio.Client()
 
@@ -106,7 +97,7 @@ def on_print_requested(data):
         printer.printImage(image)
         if 'captation' in data:
             printer.printBreak(30)
-            printer.printlnASCII(remove_accents(data['captation']))
+            printer.printlnASCII(data['captation'])
         printer.printBreak(150)
         sio.emit('agent_response', {
             'request_id': data['request_id'],
