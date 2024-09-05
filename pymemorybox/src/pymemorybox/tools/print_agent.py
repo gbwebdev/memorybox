@@ -3,8 +3,44 @@ import peripage
 
 from PIL import Image
 import io
+import time
 
 from bluetooth.btcommon import BluetoothError
+
+
+def split_image_into_chunks(image_data, chunk_height=100):
+    image = Image.open(io.BytesIO(image_data))
+    image.show()
+
+    # Get the dimensions of the image
+    img_width, img_height = image.size
+    
+    # Initialize the starting y coordinate
+    y_start = 0
+    
+    # List to hold chunks
+    chunks = []
+    
+    # Loop through the image and create chunks
+    while y_start < img_height:
+        # Calculate the ending y coordinate
+        y_end = min(y_start + chunk_height, img_height)
+        
+        # Create the crop box (left, upper, right, lower)
+        box = (0, y_start, img_width, y_end)
+        
+        # Crop the image
+        chunk = image.crop(box)
+
+        
+        # Append the chunk to the list
+        chunks.append(chunk)
+        
+        # Increment the y coordinate
+        y_start += chunk_height
+    
+    return chunks
+
 
 # Create a Socket.IO client
 sio = socketio.Client()
@@ -69,8 +105,7 @@ def on_print_requested(data):
 
     try:
         image_data = data['image_data'] # byte values of the image
-        image = Image.open(io.BytesIO(image_data))
-        image.show()
+        chunks = split_image_into_chunks(image_data)
         sio.emit('agent_response', {
             'request_id': data['request_id'],
             'memory_id': data['memory_id'],
@@ -94,7 +129,9 @@ def on_print_requested(data):
     
     try:
         printer.setConcentration(1)
-        printer.printImage(image)
+        for chunk in chunks:
+            printer.printImage(chunk)
+            time.sleep(15)
         if 'captation' in data:
             printer.printBreak(30)
             printer.printlnASCII(data['captation'])

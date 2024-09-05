@@ -121,6 +121,33 @@ def init_db(reset):
         init_db.init_db(reset)
 
 @cli.command()
+@with_appcontext
+@click.option('-u',
+            '--username',
+            required=True,
+            type=str,
+            help="The user's name.")
+@click.option('-p',
+            '--password',
+            required=True,
+            type=str,
+            help="The user's password.")
+def create_user(username, password):
+    """Create a user"""
+    logger.info("Creating a user")
+    import uuid
+    from pymemorybox.model.user import User
+    from werkzeug.security import generate_password_hash
+    from pymemorybox.db import db
+    new_user = User(
+                username=username,
+                password=generate_password_hash(password),
+                uid=str(uuid.uuid4()).strip())
+    with current_app.app_context():
+        db.session.add(new_user)
+        db.session.commit()
+
+@cli.command()
 def run_dev():
     """Run in dev mode"""
     logger.info("Running the dev server.")

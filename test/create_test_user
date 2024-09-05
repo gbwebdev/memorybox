@@ -1,1 +1,1 @@
-INSERT INTO user(uid, username, password) VALUES('1234-abcd', 'testuser', 'scrypt:32768:8:1$X0BorOSDdf8eY12s$1f432cebe36303295962ccde4a6344288455aed627163032fec4e51ceb00dba9fff25b3472f476931abffcac7162d2be56089e975422dda129ed7b2c7ed7fb8c')
+INSERT INTO user(uid, username, password) VALUES('1234-abcd', 'testuser', 'scrypt:32768:8:1$HNYSGhqvBRKtnCh0$d772ebbe74ff7457ef7b673a5dc1c08ef7a8024d817ab74d257b1457dbd110093659bc7246407ed8c2290c6537601fe9b13fcd85a961c21eb261602de75e9972');

@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+from io import BytesIO
 from datetime import date, datetime, timedelta
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
@@ -10,6 +11,7 @@ from flask_socketio import emit, disconnect
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from sqlalchemy import desc
 from peripage import PrinterType
+from PIL import Image
 
 # from memorybox.db import get_db
 from pymemorybox import socketio
@@ -62,9 +64,7 @@ def connect():
         current_app.logger.info(f"Agent connected.")
     else:
         try:
-            current_app.logger.debug(token)
             decoded_token = decode_token(token)
-            current_app.logger.debug(decoded_token)
             identity = decoded_token['sub']  # 'sub' is the default key for identity in JWT
             current_app.logger.info(f"User {identity} connected.")
         except Exception as e:
@@ -79,8 +79,14 @@ def handle_print(id):
     the_memory = get_memory_by_id(id)
     if the_memory:
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
-        with open(image_path, 'rb') as f:
-            image_data = f.read()
+        image = Image.open(image_path)
+        if Config.optimize_orientation:
+            image = image.rotate(90, expand=True)
+        img_byte_arr = BytesIO()
+        image.save(img_byte_arr, format='JPEG')
+        image_data = img_byte_arr.getvalue()
+        # with open(image_path, 'rb') as f:
+        #     image_data = f.read()
         payload = {
                 'request_id': uid,
                 'memory_id': id,
@@ -92,14 +98,11 @@ def handle_print(id):
              }
         if Config().print_captation:
             payload['captation'] = remove_accents(the_memory.captation)
-        current_app.logger.debug(payload)
         emit('request_print', payload, broadcast=True)
         return uid
 
 @socketio.on('agent_response')
 def handle_agent_response(data):
-    current_app.logger.debug('agent_response :')
-    current_app.logger.debug(data)
     if data.get('status', 0) == 200:
         if 'memory_id' in data:
             memory = get_memory_by_id(data['memory_id'])
