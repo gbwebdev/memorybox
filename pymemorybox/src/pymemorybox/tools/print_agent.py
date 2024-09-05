@@ -8,12 +8,14 @@ import time
 from bluetooth.btcommon import BluetoothError
 
 
-def split_image_into_chunks(image_data, chunk_height=100):
+def split_image_into_chunks(image_data):
     image = Image.open(io.BytesIO(image_data))
     image.show()
 
     # Get the dimensions of the image
     img_width, img_height = image.size
+
+    chunk_height =  img_width - 1
     
     # Initialize the starting y coordinate
     y_start = 0
