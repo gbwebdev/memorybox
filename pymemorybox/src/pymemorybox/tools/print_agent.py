@@ -131,9 +131,10 @@ def on_print_requested(data):
     
     try:
         printer.setConcentration(1)
-        for chunk in chunks:
+        for i, chunk in enumerate(chunks):
             printer.printImage(chunk)
-            time.sleep(15)
+            if i < len(chunks) - 1:
+                time.sleep(15)
         if 'captation' in data:
             printer.printBreak(30)
             printer.printlnASCII(data['captation'])
