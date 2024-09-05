@@ -80,7 +80,8 @@ def handle_print(id):
     if the_memory:
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
         image = Image.open(image_path)
-        if Config.optimize_orientation:
+        img_width, img_height = image.size
+        if Config.optimize_orientation and img_width > img_height:
             image = image.rotate(90, expand=True)
         img_byte_arr = BytesIO()
         image.save(img_byte_arr, format='JPEG')
