@@ -134,7 +134,7 @@ def on_print_requested(data):
         for i, chunk in enumerate(chunks):
             printer.printImage(chunk)
             if i < len(chunks) - 1:
-                time.sleep(15)
+                time.sleep(30)
         if 'captation' in data:
             printer.printBreak(30)
             printer.printlnASCII(data['captation'])
