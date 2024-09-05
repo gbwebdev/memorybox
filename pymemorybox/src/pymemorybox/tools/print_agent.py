@@ -15,7 +15,10 @@ def split_image_into_chunks(image_data):
     # Get the dimensions of the image
     img_width, img_height = image.size
 
-    chunk_height =  img_width - 1
+    if img_height > img_width*1.6 :
+        chunk_height =  int(img_height / 3)
+    elif img_height > img_width*1.2 :
+        chunk_height =  int(img_height / 2)
     
     # Initialize the starting y coordinate
     y_start = 0
