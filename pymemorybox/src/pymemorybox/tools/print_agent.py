@@ -34,9 +34,9 @@ def split_image_into_chunks(image_data):
         # Crop the image
         chunk = image.crop(box)
 
-        
-        # Append the chunk to the list
-        chunks.append(chunk)
+        if y_end != y_start:
+            # Append the chunk to the list
+            chunks.append(chunk)
         
         # Increment the y coordinate
         y_start += chunk_height
