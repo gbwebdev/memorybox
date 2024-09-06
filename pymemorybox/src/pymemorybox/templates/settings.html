@@ -81,6 +81,10 @@
                                     <input type="text" class="form-control" id="printerMacAddress" name="printerMacAddress" value="{{ settings.printer_mac_address }}" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="printerConcentration" class="form-label">Concentration</label>
+                                    <input type="number" class="form-control" id="printerConcentration" name="printerConcentration" min="0" max="2" step="1" value="{{ settings.printer_concentration }}" required>
+                                </div>
+                                <div class="mb-3">
                                     <input class="form-check-input" type="checkbox" value="true" id="optimizeOrientation" name="optimizeOrientation" {% if settings.optimize_orientation %}checked{% endif %}>
                                     <label for="optimizeOrientation" class="form-label">
                                         Optimize orientation (rotate if width is larger than height)

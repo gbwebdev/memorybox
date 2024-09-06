@@ -94,7 +94,8 @@ def handle_print(id):
                 'image_data': image_data,
                 'printer': {
                     'mac_address': Config().printer_mac_address,
-                    'model': Config().printer_model.name
+                    'model': Config().printer_model.name,
+                    'concentration': Config()._printer_concentration
                 }
              }
         if Config().print_captation:
@@ -187,6 +188,7 @@ def settings():
         config.enable_printing = data.get('enablePrinting', 'false') == 'true'
         config.printer_model = PrinterType[data.get('printerType')]
         config.printer_mac_address = data.get('printerMacAddress')
+        config.printer_concentration = data.get('printerConcentration')
         config.optimize_orientation = data.get('optimizeOrientation')
         config.print_captation = data.get('printCaptation')
 

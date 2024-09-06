@@ -39,6 +39,7 @@ class Config(metaclass=Singleton):
         self._enable_holiday_mode = False
         self._printer_mac_address = "01:23:45:67:89:AF"
         self._printer_model = PrinterType.A6p
+        self._printer_concentration = 1
         self._optimize_orientation = True
         self._print_captation = True
 
@@ -63,6 +64,7 @@ class Config(metaclass=Singleton):
                 'settings': {
                     'printer_mac_address': self._printer_mac_address,
                     'printer_model': self._printer_model.name,
+                    'printer_concentration': self._printer_concentration,
                     'optimize_orientation': self._optimize_orientation,
                     'print_captation': self._print_captation,
                     'daily_printing': {
@@ -104,6 +106,8 @@ class Config(metaclass=Singleton):
                                                               self._printer_mac_address)
             self._printer_model = PrinterType[printing_settings.get('printer_model',
                                                                     self._printer_model.name)]
+            self._printer_concentration = printing_settings.get('printer_concentration',
+                                                                    self._printer_concentration)
             self._optimize_orientation = printing_settings.get('optimize_orientation',
                                                                self._optimize_orientation)
             self._print_captation = printing_settings.get('print_captation',
@@ -250,6 +254,17 @@ class Config(metaclass=Singleton):
     def printer_mac_address(self, printer_mac_address: str):
         assert Config.mac_regexp.match(printer_mac_address)
         self._printer_mac_address = printer_mac_address
+        self._handle_autosave()
+
+    @property
+    def printer_concentration(self) -> int:
+        """Printing concentration.
+        """
+        return self._printer_concentration
+
+    @printer_concentration.setter
+    def printer_concentration(self, printer_concentration: int):
+        self._printer_concentration = printer_concentration
         self._handle_autosave()
 
     @property

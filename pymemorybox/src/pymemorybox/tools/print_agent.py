@@ -133,7 +133,8 @@ def on_print_requested(data):
         return False
     
     try:
-        printer.setConcentration(1)
+
+        printer.setConcentration(data['printer'].get("concentration", 1))
         sio.emit('agent_response', {
             'request_id': data['request_id'],
             'memory_id': data['memory_id'],
