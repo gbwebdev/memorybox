@@ -10,7 +10,7 @@ if [ "$RUN_MODE" = "prod" ]; then
     --bind 0.0.0.0:$GUNICORN_PORT \
     --log-level $LOG_LEVEL \
     --timeout $GUNICORN_TIMEOUT \
-    memorybox.wsgi:app
+    pymemorybox.wsgi:app
 else
   pip install -e ./pymemorybox
   python3 -m pymemorybox
