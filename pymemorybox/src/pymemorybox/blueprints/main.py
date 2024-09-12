@@ -3,6 +3,7 @@ import os
 import uuid
 from io import BytesIO
 from datetime import date, datetime, timedelta
+from time import sleep
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, send_from_directory
 )
@@ -56,7 +57,8 @@ def get_memory_by_date(date_value: date):
 @socketio.on('connect')
 def connect():
     token = request.args.get('token', request.headers.get('token'))
-    current_app.logger.info(f"WS connection: Token : {token}")
+    current_app.logger.debug(f"WS connection: Token : {token}")
+    sleep(0.01)
     if token is None:
         current_app.logger.warning("WS connection: no token provided")
         return False  # Reject the connection
@@ -78,14 +80,18 @@ def connect():
 def handle_print(id):
     uid = str(uuid.uuid4()).strip()
     the_memory = get_memory_by_id(id)
+    sleep(0.01)
     if the_memory:
         image_path = os.path.join(current_app.instance_path, f'memories/thumbs/{the_memory.filename}')
         image = Image.open(image_path)
+        sleep(0.01)
         img_width, img_height = image.size
         if Config.optimize_orientation and img_width > img_height:
             image = image.rotate(90, expand=True)
+            sleep(0.01)
         img_byte_arr = BytesIO()
         image.save(img_byte_arr, format='JPEG')
+        sleep(0.01)
         image_data = img_byte_arr.getvalue()
         # with open(image_path, 'rb') as f:
         #     image_data = f.read()

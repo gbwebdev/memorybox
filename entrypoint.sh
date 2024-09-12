@@ -9,6 +9,7 @@ if [ "$RUN_MODE" = "prod" ]; then
     --bind 0.0.0.0:$GUNICORN_PORT \
     --log-level $LOG_LEVEL \
     --timeout $GUNICORN_TIMEOUT \
+    --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
     pymemorybox.wsgi:app
 else
   pip install -e ./pymemorybox
