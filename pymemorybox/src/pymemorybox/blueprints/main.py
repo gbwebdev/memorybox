@@ -56,19 +56,20 @@ def get_memory_by_date(date_value: date):
 @socketio.on('connect')
 def connect():
     token = request.args.get('token', request.headers.get('token'))
-    current_app.logger.info(f"Token : {token}")
+    current_app.logger.info(f"WS connection: Token : {token}")
     if token is None:
+        current_app.logger.warning("WS connection: no token provided")
         return False  # Reject the connection
 
     if token == current_app.config["AGENT_TOKEN"]:
-        current_app.logger.info(f"Agent connected.")
+        current_app.logger.info("WS connection: Agent connected.")
     else:
         try:
             decoded_token = decode_token(token)
             identity = decoded_token['sub']  # 'sub' is the default key for identity in JWT
-            current_app.logger.info(f"User {identity} connected.")
+            current_app.logger.info(f"WS connection: User {identity} connected.")
         except Exception as e:
-            current_app.logger.error(f"Connection refused: {str(e)}")
+            current_app.logger.error(f"WS connection: connection refused: {str(e)}")
             disconnect()
             return False
 
