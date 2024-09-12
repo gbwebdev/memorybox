@@ -58,7 +58,7 @@ def get_memory_by_date(date_value: date):
 def connect():
     token = request.args.get('token', request.headers.get('token'))
     current_app.logger.debug(f"WS connection: Token : {token}")
-    sleep(0.01)
+    sleep(0)
     if token is None:
         current_app.logger.warning("WS connection: no token provided")
         return False  # Reject the connection
@@ -74,6 +74,10 @@ def connect():
             current_app.logger.error(f"WS connection: connection refused: {str(e)}")
             disconnect()
             return False
+
+@socketio.on('disconnect')
+def client_disconnected():
+    current_app.logger.info(f"WS: Session disconnected.")
 
 # Handle button click event from the client-side
 @socketio.on('print')

@@ -10,6 +10,7 @@ if [ "$RUN_MODE" = "prod" ]; then
     --log-level $LOG_LEVEL \
     --timeout $GUNICORN_TIMEOUT \
     --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
+    --access-logfile '-' \
     pymemorybox.wsgi:app
 else
   pip install -e ./pymemorybox
