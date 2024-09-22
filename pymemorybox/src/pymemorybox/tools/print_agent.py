@@ -92,7 +92,7 @@ def on_print_requested(data):
             'status': 500,
             'message': {
                 'type': 'danger',
-                'message': 'Could not connect to the printer ({e})'
+                'message': f'Could not connect to the printer ({e})'
             }
         })
         return False
