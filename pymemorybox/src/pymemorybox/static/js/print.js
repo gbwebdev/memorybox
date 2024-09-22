@@ -1,9 +1,18 @@
 const wsEndpoint = location.protocol + '//' + location.host;
 const token = localStorage.getItem('token');
 var socket = io.connect(wsEndpoint, {
-    query: { token }
+    query: { token },
+    transports: ["websocket"]
 });
 
+
+socket.on('connect', function() {
+    console.log('Connected');
+});
+
+socket.on('connect_error', function(err) {
+    console.error('Connection error:', err);
+});
 
 $('#printButton').on('click', function(event) {
     console.log("Print button clicked !");
@@ -16,11 +25,11 @@ $('#printButton').on('click', function(event) {
     }
 });
 
-// Listen for notifications from the server
-socket.on('notify_agent', function(data) {
-    console.log('Agent notified:', data.message);
-    // Here you can perform additional actions when the agent is notified
-});
+// // Listen for notifications from the server
+// socket.on('notify_agent', function(data) {
+//     console.log('Agent notified:', data.message);
+//     // Here you can perform additional actions when the agent is notified
+// });
 
 // Listen for notifications from the agent
 socket.on('agent_response', function(data) {
