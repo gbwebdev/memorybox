@@ -35,7 +35,7 @@ dependencies = [
   'uuid',
   "pyjwt",
   "Flask-JWT-Extended",
-  "APScheduler"
+  "apscheduler"
 ]
 
 [project.urls]

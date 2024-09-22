@@ -7,11 +7,17 @@ import logging
 import os
 import sys
 import click
+from datetime import datetime
+
 
 from flask import Flask, current_app, g
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 from flask_socketio import SocketIO
 from flask_jwt_extended import JWTManager
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+
 from pymemorybox.config import Config
 from pymemorybox.login import login_manager
 
@@ -21,6 +27,7 @@ logger = logging.getLogger("memorybox")
 
 socketio = SocketIO()
 jwt = JWTManager()
+scheduler = BackgroundScheduler()
 
 def create_app(*args, **kwargs):
     """Flask application factory"""
@@ -174,6 +181,36 @@ def run_print_agent(server, token):
     print_agent.run(server, token)
 
 
+def print_task(app):
+    with app.app_context():
+        from pymemorybox.blueprints.main import get_memory_by_date, handle_print
+        config = Config()
+
+        todays_memory = get_memory_by_date(date.today())
+
+        if datetime.now().strftime("%A") in ["Saturday", "Sunday"] or config.enable_holiday_mode:
+            # It is a holiday print day
+            if datetime.now().time() >= config.holiday_print_time:
+                if not todays_memory.printed:
+                    handle_print(todays_memory.id)
+        else:
+            # It is a workday print day
+            if datetime.now().time() >= config.workday_print_time:
+                if not todays_memory.printed:
+                    handle_print(todays_memory.id)
+
+def setup_print_scheduler(app):
+    with app.app_context():
+        config = Config()
+
+    scheduler.remove_all_jobs()
+    workday_trigger = CronTrigger(hour=config.workday_print_time.hour, minute=config.workday_print_time.minute)
+    holiday_trigger = CronTrigger(hour=config.holiday_print_time.hour, minute=config.holiday_print_time.minute)
+    scheduler.add_job(print_task, workday_trigger, args=[app])
+    scheduler.add_job(print_task, holiday_trigger, args=[app])
+    scheduler.start()
+
 def main():
     app = create_app(mode="dev")
+    setup_print_scheduler(app)
     socketio.run(app, host="0.0.0.0", port=8000, debug=True)

@@ -14,6 +14,8 @@ from sqlalchemy import desc
 from peripage import PrinterType
 from PIL import Image
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 # from memorybox.db import get_db
 from pymemorybox import socketio
 from pymemorybox.config import Config, MemoriesSourceType
@@ -209,6 +211,9 @@ def settings():
         config.enable_holiday_mode = data.get('enableHolidayMode', 'false') == 'true'
 
         config.save_conf()
+
+        from pymemorybox import setup_print_scheduler
+        setup_print_scheduler(current_app)
 
     # Get PrinterType values :
     return render_template('settings.html', settings=config, source_types=MemoriesSourceType, printer_types=PrinterType)
