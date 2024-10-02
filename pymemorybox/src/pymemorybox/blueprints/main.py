@@ -37,7 +37,7 @@ def get_memory_by_date(date_value: date):
     res = Memory.query.filter_by(release_date=date_value).first()
     if not res :
         if date_value >= current_app.config['APP_RELEASE_DATE'] and date_value <= date.today():
-            first_candidate = Memory.query.filter_by(release_date=None).first()
+            first_candidate = Memory.query.filter_by(release_date=None).order_by(Memory.filename).first()
             if first_candidate:
                 first_candidate.release_date = date_value
                 db.session.commit()
@@ -47,8 +47,8 @@ def get_memory_by_date(date_value: date):
                 return None
         else:
             return None
-    else:
-        return res
+    
+    return res
 
 # @bp.route('/manifest.json')
 # def serve_manifest():
